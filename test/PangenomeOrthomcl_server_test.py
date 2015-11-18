@@ -73,9 +73,10 @@ class PangenomeOrthomclTest(unittest.TestCase):
             for record in SeqIO.parse(file_path, "fasta"):
                 id = record.id
                 sequence = str(record.seq)
-                features.append({"id" : id, "location" : [["1", 0, "+", 0]], "type" : "CDS", 
-                                 "protein_translation" : sequence, "aliases" : [], 
-                                 "annotations" : [], "function" : ""})
+                if len(sequence) <= 100:
+                    features.append({"id" : id, "location" : [["1", 0, "+", 0]], "type" : "CDS", 
+                                     "protein_translation" : sequence, "aliases" : [], 
+                                     "annotations" : [], "function" : ""})
             genome_obj = {"complete" : 0, "contig_ids" : ["1"], "contig_lengths" : [10],
                           "contigset_ref" : self.getWsName() + "/" + contig_obj_name, 
                           "dna_size" : 10, "domain" : "Bacteria", "gc_content" : 0.5,

@@ -129,7 +129,6 @@ BuildPangenomeWithOrthmclParams is a reference to a hash where the following key
 BuildPangenomeWithOrthmclResult is a reference to a hash where the following keys are defined:
 	output_log has a value which is a string
 	pangenome_ref has a value which is a string
-	error has a value which is a string
 
 </pre>
 
@@ -146,7 +145,6 @@ BuildPangenomeWithOrthmclParams is a reference to a hash where the following key
 BuildPangenomeWithOrthmclResult is a reference to a hash where the following keys are defined:
 	output_log has a value which is a string
 	pangenome_ref has a value which is a string
-	error has a value which is a string
 
 
 =end text
@@ -316,7 +314,6 @@ One of 'pangenome_ref' and 'error' fields should be defined.
 a reference to a hash where the following keys are defined:
 output_log has a value which is a string
 pangenome_ref has a value which is a string
-error has a value which is a string
 
 </pre>
 
@@ -327,7 +324,6 @@ error has a value which is a string
 a reference to a hash where the following keys are defined:
 output_log has a value which is a string
 pangenome_ref has a value which is a string
-error has a value which is a string
 
 
 =end text

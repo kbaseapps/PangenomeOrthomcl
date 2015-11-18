@@ -15,7 +15,6 @@ module PangenomeOrthomcl {
     typedef structure {
         string output_log;
         string pangenome_ref;
-        string error;
     } BuildPangenomeWithOrthmclResult;
 
     funcdef build_pangenome_with_orthomcl(BuildPangenomeWithOrthmclParams params)

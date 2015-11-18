@@ -22,8 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "output_log",
-    "pangenome_ref",
-    "error"
+    "pangenome_ref"
 })
 public class BuildPangenomeWithOrthmclResult {
 
@@ -31,8 +30,6 @@ public class BuildPangenomeWithOrthmclResult {
     private String outputLog;
     @JsonProperty("pangenome_ref")
     private String pangenomeRef;
-    @JsonProperty("error")
-    private String error;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("output_log")
@@ -65,21 +62,6 @@ public class BuildPangenomeWithOrthmclResult {
         return this;
     }
 
-    @JsonProperty("error")
-    public String getError() {
-        return error;
-    }
-
-    @JsonProperty("error")
-    public void setError(String error) {
-        this.error = error;
-    }
-
-    public BuildPangenomeWithOrthmclResult withError(String error) {
-        this.error = error;
-        return this;
-    }
-
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -92,7 +74,7 @@ public class BuildPangenomeWithOrthmclResult {
 
     @Override
     public String toString() {
-        return ((((((((("BuildPangenomeWithOrthmclResult"+" [outputLog=")+ outputLog)+", pangenomeRef=")+ pangenomeRef)+", error=")+ error)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((("BuildPangenomeWithOrthmclResult"+" [outputLog=")+ outputLog)+", pangenomeRef=")+ pangenomeRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
