@@ -125,7 +125,7 @@ class PangenomeOrthomcl:
                         id = str(feature_pos + 1)
                         record = SeqRecord(Seq(sequence), id=id, description="")
                         records.append(record)
-                        feature_info[genome_id + "|" + id] = {"fid": feature["id"], "gid": genome_id, "gref": genome_ref}
+                        feature_info[genome_id + "|" + id] = {"fid" : feature["id"], "fpos" : feature_pos, "gref" : genome_ref, "func" : feature["function"]}
                 fasta_file = self.scratch + "/" + genome_id + ".fasta"
                 SeqIO.write(records, fasta_file, "fasta")
                 #######################################################
@@ -170,18 +170,35 @@ class PangenomeOrthomcl:
                 log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclMclToGroups", "grp", "1000"], cwd=self.scratch, stdin=infile, stdout=outfile, stderr=subprocess.PIPE))
             #######################################################
             log += "Parsing groups file\n"
-            prots = "";
+            output_obj_name = params["output_pangenome_id"]
+            orthologs = [];
             with open(groups_file, "r") as infile:
-                for line in infile.readlines():
+                for line_pos, line in enumerate(infile.readlines()):
+                    cluster_id = "cluster" + str(line_pos + 1)
+                    function = ""
+                    items = []
                     words = line.rstrip().split(" ")
                     for id in words[1:]:
                         feature = feature_info[id]
-                        prots += id + "(" + feature["fid"] + ") "
-            raise ValueError(prots)
+                        items.append([feature['fid'], feature['fpos'], feature['gref']])
+                        func = feature['func']
+                        if func is not None and len(func) > len(function):
+                            function = func
+                    orthologs.append({"function" : function, "id" : cluster_id, "orthologs" : items})
+            pangenome = {"genome_refs" : genome_refs, "id" : output_obj_name, "name" : output_obj_name, "orthologs" : orthologs, "type" : "orthomcl"}
+            #######################################################
+            log += "Saving pangenome object\n"
+            prov = {"service": "PangenomeOrthomcl", "method": "build_pangenome_with_orthomcl",
+                    "service_ver": "0.1", "input_ws_objects": [params["intput_genomeset_ref"]], 
+                    "description": "Orthologous groups construction using OrthoMCL tool", 
+                    "method_params": [params]}
+            info = ws.save_objects({"workspace": params["output_workspace"], "objects":
+                [{"type": "KBaseGenomes.Pangenome", "name": output_obj_name, 
+                  'data': pangenome, "provenance": [prov]}]})[0]
+            returnVal = {"output_log" : log, "pangenome_ref" : str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])}
         except Exception, err:
             log += traceback.format_exc() + "\n"
             raise ValueError(log)
-        returnVal = {}
         #END build_pangenome_with_orthomcl
 
         # At some point might do deeper type checking...

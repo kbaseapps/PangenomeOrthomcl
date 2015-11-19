@@ -91,14 +91,12 @@ class PangenomeOrthomclTest(unittest.TestCase):
         genomeset_obj_name = "genomeset.1"
         self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects':
                 [{'type': 'KBaseSearch.GenomeSet', 'name': genomeset_obj_name, 'data': genomeset_obj}]})
-        # Prepare test objects in workspace if needed using 
-        # self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects': []})
         output_pangenome_name = "pangenome.1"
         ret = self.getImpl().build_pangenome_with_orthomcl(self.getContext(), {
                 "intput_genomeset_ref" : self.getWsName() + "/" + genomeset_obj_name,
-                "output_workspace" : self.getWsName(), "output_pangenome_id" : output_pangenome_name})
-        
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
+                "output_workspace" : self.getWsName(), "output_pangenome_id" : output_pangenome_name})[0]
+        print(ret["output_log"])
+        pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}])[0]['data']
+        self.assertEqual(len(pangenome["orthologs"]), 350)
         pass
         
