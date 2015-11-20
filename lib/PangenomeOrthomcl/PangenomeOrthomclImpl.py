@@ -125,7 +125,10 @@ class PangenomeOrthomcl:
                         id = str(feature_pos + 1)
                         record = SeqRecord(Seq(sequence), id=id, description="")
                         records.append(record)
-                        feature_info[genome_id + "|" + id] = {"fid" : feature["id"], "fpos" : feature_pos, "gref" : genome_ref, "func" : feature["function"]}
+                        func = None
+                        if "function" in feature:
+                            func = feature["function"]
+                        feature_info[genome_id + "|" + id] = {"fid" : feature["id"], "fpos" : feature_pos, "gref" : genome_ref, "func" : func}
                 fasta_file = self.scratch + "/" + genome_id + ".fasta"
                 SeqIO.write(records, fasta_file, "fasta")
                 #######################################################
