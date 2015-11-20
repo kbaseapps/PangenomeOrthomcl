@@ -1,0 +1,49 @@
+#
+# define display information
+#
+name: Build Pangenome with OrthoMCL
+tooltip: |
+	Perform OrthoMCL orthologous groups construction
+screenshots: []
+
+icon: icon.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+	apps:
+		related:
+			[]
+		next:
+			[]
+	methods:
+		related:
+			[]
+		next:
+			[]
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    input_genomeset :
+        ui-name : |
+            Genome Set
+        short-hint : |
+            A set of references to genomes stored in KBase
+        long-hint  : |
+            A set of references to genomes stored in KBase
+
+    output_pangenome :
+        ui-name : |
+            Pangenome ID
+        short-hint : |
+            A list of all distinct protein families identified in input genome set
+        long-hint  : |
+            A list of all distinct protein families identified by OrthoMCL tool in a set of input genome sequences, as well as the IDs of the proteins present in each family
+
+
+description : |
+	<p>This is a package wrapping OrthoMCL tool in KBase docker container. Input is set of genomes, output is Pangenome object.</p>
+	<p>Li Li, Christian J. Stoeckert, Jr., and David S. Roos. OrthoMCL: Identification of Ortholog Groups for Eukaryotic Genomes. Genome Res. 2003 13: 2178-2189.</p>

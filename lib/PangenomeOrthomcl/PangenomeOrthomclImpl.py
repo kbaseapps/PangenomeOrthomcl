@@ -100,7 +100,7 @@ class PangenomeOrthomcl:
             log += "Loading GenomeSet object from workspace\n"
             token = ctx['token']
             ws = workspaceService(self.workspaceURL, token=token)
-            genomeset = ws.get_objects([{'ref':params["intput_genomeset_ref"]}])[0]['data']
+            genomeset = ws.get_objects([{'ref':params["input_genomeset_ref"]}])[0]['data']
             #######################################################
             log += "Preparing genome refs\n"
             genome_refs = []
@@ -189,7 +189,7 @@ class PangenomeOrthomcl:
             #######################################################
             log += "Saving pangenome object\n"
             prov = {"service": "PangenomeOrthomcl", "method": "build_pangenome_with_orthomcl",
-                    "service_ver": "0.1", "input_ws_objects": [params["intput_genomeset_ref"]], 
+                    "service_ver": "0.1", "input_ws_objects": [params["input_genomeset_ref"]], 
                     "description": "Orthologous groups construction using OrthoMCL tool", 
                     "method_params": [params]}
             info = ws.save_objects({"workspace": params["output_workspace"], "objects":

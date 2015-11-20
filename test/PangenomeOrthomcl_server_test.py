@@ -93,7 +93,7 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 [{'type': 'KBaseSearch.GenomeSet', 'name': genomeset_obj_name, 'data': genomeset_obj}]})
         output_pangenome_name = "pangenome.1"
         ret = self.getImpl().build_pangenome_with_orthomcl(self.getContext(), {
-                "intput_genomeset_ref" : self.getWsName() + "/" + genomeset_obj_name,
+                "input_genomeset_ref" : self.getWsName() + "/" + genomeset_obj_name,
                 "output_workspace" : self.getWsName(), "output_pangenome_id" : output_pangenome_name})[0]
         print(ret["output_log"])
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}])[0]['data']

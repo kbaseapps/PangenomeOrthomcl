@@ -4,7 +4,7 @@ A KBase module: PangenomeOrthomcl
 module PangenomeOrthomcl {
 
     typedef structure {
-        string intput_genomeset_ref;
+        string input_genomeset_ref;
         string output_workspace;
         string output_pangenome_id;
     } BuildPangenomeWithOrthmclParams;

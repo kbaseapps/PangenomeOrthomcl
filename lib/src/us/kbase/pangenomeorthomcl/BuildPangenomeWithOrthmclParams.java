@@ -19,32 +19,32 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "intput_genomeset_ref",
+    "input_genomeset_ref",
     "output_workspace",
     "output_pangenome_id"
 })
 public class BuildPangenomeWithOrthmclParams {
 
-    @JsonProperty("intput_genomeset_ref")
-    private String intputGenomesetRef;
+    @JsonProperty("input_genomeset_ref")
+    private String inputGenomesetRef;
     @JsonProperty("output_workspace")
     private String outputWorkspace;
     @JsonProperty("output_pangenome_id")
     private String outputPangenomeId;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("intput_genomeset_ref")
-    public String getIntputGenomesetRef() {
-        return intputGenomesetRef;
+    @JsonProperty("input_genomeset_ref")
+    public String getInputGenomesetRef() {
+        return inputGenomesetRef;
     }
 
-    @JsonProperty("intput_genomeset_ref")
-    public void setIntputGenomesetRef(String intputGenomesetRef) {
-        this.intputGenomesetRef = intputGenomesetRef;
+    @JsonProperty("input_genomeset_ref")
+    public void setInputGenomesetRef(String inputGenomesetRef) {
+        this.inputGenomesetRef = inputGenomesetRef;
     }
 
-    public BuildPangenomeWithOrthmclParams withIntputGenomesetRef(String intputGenomesetRef) {
-        this.intputGenomesetRef = intputGenomesetRef;
+    public BuildPangenomeWithOrthmclParams withInputGenomesetRef(String inputGenomesetRef) {
+        this.inputGenomesetRef = inputGenomesetRef;
         return this;
     }
 
@@ -90,7 +90,7 @@ public class BuildPangenomeWithOrthmclParams {
 
     @Override
     public String toString() {
-        return ((((((((("BuildPangenomeWithOrthmclParams"+" [intputGenomesetRef=")+ intputGenomesetRef)+", outputWorkspace=")+ outputWorkspace)+", outputPangenomeId=")+ outputPangenomeId)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((("BuildPangenomeWithOrthmclParams"+" [inputGenomesetRef=")+ inputGenomesetRef)+", outputWorkspace=")+ outputWorkspace)+", outputPangenomeId=")+ outputPangenomeId)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

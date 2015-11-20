@@ -1,0 +1,76 @@
+{
+    "ver": "0.0.1",
+    
+    "authors": [
+        "rsutormin"
+    ],
+    "contact": "rsutormin@lbl.gov",
+    "visible": true,
+    "categories": ["active"],
+    "widgets": {
+        "input": null,
+        "output": "kbasePanGenome"
+    },
+    "parameters": [ 
+        {
+            "id": "input_genomeset",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseSearch.GenomeSet" ]
+            }
+        },
+        {
+            "id": "output_pangenome",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseGenomes.Pangenome" ],
+                "is_output_name":true
+            }
+        }
+    ],
+    "behavior": {
+        "service-mapping": {
+            "url": "",
+            "name": "PangenomeOrthomcl",
+            "method": "build_pangenome_with_orthomcl",
+            "input_mapping": [
+                {
+                    "input_parameter": "input_genomeset",
+                    "target_property": "input_genomeset_ref",
+                    "target_type_transform": "ref"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "output_workspace"
+                },
+                {
+                    "input_parameter": "output_pangenome",
+                    "target_property": "output_pangenome_id"
+                }
+            ],
+            "output_mapping": [
+                {
+                    "service_method_output_path": [0],
+                    "target_property": "output"
+                },
+                {
+                    "input_parameter": "output_pangenome",
+                    "target_property": "name"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "ws"
+                }
+            ]
+        }
+    },
+    "job_id_output_field": "docker"
+}

@@ -123,7 +123,7 @@ sub new
 $params is a PangenomeOrthomcl.BuildPangenomeWithOrthmclParams
 $return is a PangenomeOrthomcl.BuildPangenomeWithOrthmclResult
 BuildPangenomeWithOrthmclParams is a reference to a hash where the following keys are defined:
-	intput_genomeset_ref has a value which is a string
+	input_genomeset_ref has a value which is a string
 	output_workspace has a value which is a string
 	output_pangenome_id has a value which is a string
 BuildPangenomeWithOrthmclResult is a reference to a hash where the following keys are defined:
@@ -139,7 +139,7 @@ BuildPangenomeWithOrthmclResult is a reference to a hash where the following key
 $params is a PangenomeOrthomcl.BuildPangenomeWithOrthmclParams
 $return is a PangenomeOrthomcl.BuildPangenomeWithOrthmclResult
 BuildPangenomeWithOrthmclParams is a reference to a hash where the following keys are defined:
-	intput_genomeset_ref has a value which is a string
+	input_genomeset_ref has a value which is a string
 	output_workspace has a value which is a string
 	output_pangenome_id has a value which is a string
 BuildPangenomeWithOrthmclResult is a reference to a hash where the following keys are defined:
@@ -273,7 +273,7 @@ sub _validate_version {
 
 <pre>
 a reference to a hash where the following keys are defined:
-intput_genomeset_ref has a value which is a string
+input_genomeset_ref has a value which is a string
 output_workspace has a value which is a string
 output_pangenome_id has a value which is a string
 
@@ -284,7 +284,7 @@ output_pangenome_id has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-intput_genomeset_ref has a value which is a string
+input_genomeset_ref has a value which is a string
 output_workspace has a value which is a string
 output_pangenome_id has a value which is a string
 
