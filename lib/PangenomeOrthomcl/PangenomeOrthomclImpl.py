@@ -83,6 +83,7 @@ class PangenomeOrthomcl:
         #BEGIN build_pangenome_with_orthomcl
         log = ""
         try:
+            log += "Input parameters: " + json.dumps(params) + "\n"
             if os.path.exists(self.scratch):
                 shutil.rmtree(self.scratch)
             os.makedirs(self.scratch)
@@ -137,7 +138,8 @@ class PangenomeOrthomcl:
                 log += "Genome references from genome set: " + ", ".join(genome_refs) + "\n"
             if "input_genome_refs" in params and params["input_genome_refs"] is not None:
                 for genome_ref in params["input_genome_refs"]:
-                    genome_refs.append(genome_ref)
+                    if genome_ref is not None:
+                        genome_refs.append(genome_ref)
                 log += "Final list of genome references: " + ", ".join(genome_refs) + "\n"
             if len(genome_refs) < 2:
                 raise ValueError('Number of genomes should be more than 1')
@@ -282,7 +284,9 @@ class PangenomeOrthomcl:
             if "input_genomeset_ref" in params and params["input_genomeset_ref"] is not None:
                 input_ws_objects.append(params["input_genomeset_ref"])
             if "input_genome_refs" in params and params["input_genome_refs"] is not None:
-                input_ws_objects.extend(params["input_genome_refs"])
+                for genome_ref in params["input_genome_refs"]:
+                    if genome_ref is not None:
+                        input_ws_objects.append(genome_ref)
             prov = {"service": "PangenomeOrthomcl", "method": "build_pangenome_with_orthomcl",
                     "service_ver": "0.1", "input_ws_objects": input_ws_objects, 
                     "description": "Orthologous groups construction using OrthoMCL tool", 

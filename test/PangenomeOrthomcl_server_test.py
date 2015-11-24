@@ -109,7 +109,7 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 "mcl_p": 10000, "mcl_s": 1100, "mcl_r": 1400, "mcl_pct": 90, 
                 "mcl_warn_p": 10, "mcl_warn_factor": 1000, "mcl_init_l": 0, 
                 "mcl_main_l": 10000, "mcl_init_i": 2.0, "mcl_main_i": 1.5,
-                "input_genome_refs": None})[0]
+                "input_genome_refs": [None]})[0]
         print(ret["output_log"])
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
                 [0]['data']
