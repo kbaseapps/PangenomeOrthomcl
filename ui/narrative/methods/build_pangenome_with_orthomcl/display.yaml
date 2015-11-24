@@ -35,6 +35,14 @@ parameters :
         long-hint  : |
             A set of references to genomes stored in KBase
 
+    input_genomes :
+        ui-name : |
+            Genomes
+        short-hint : |
+            A list of references to genomes stored in KBase
+        long-hint  : |
+            A list of references to genomes stored in KBase
+
     output_pangenome :
         ui-name : |
             Pangenome ID
@@ -42,6 +50,199 @@ parameters :
             A list of all distinct protein families identified in input genome set
         long-hint  : |
             A list of all distinct protein families identified by OrthoMCL tool in a set of input genome sequences, as well as the IDs of the proteins present in each family
+
+    num_descriptions :
+        ui-name : |
+            num_descriptions
+        short-hint : |
+            Store one-line descriptions for this number of database sequences
+        long-hint : |
+            [blastp, -v] Store one-line descriptions for this number of database sequences. Default value is 100000.
+            
+    num_alignments :
+        ui-name : |
+            num_alignments
+        short-hint : |
+            Store alignments for this number of database sequences
+        long-hint : |
+            [blastp, -b] Store alignments for this number of 
+            database sequences. Default value is 100000.
+            
+    evalue :
+        ui-name : |
+            evalue
+        short-hint : |
+            Expect value (E) for saving hits
+        long-hint : |
+            [blastp, -e] Expect value (E) for saving hits. Default value is 1e-5.
+            
+    word_size :
+        ui-name : |
+            word_size
+        short-hint : |
+            Word size of initial match
+        long-hint : |
+            [blastp, -W] Word size of initial match. Valid word sizes are 2-7. Default value is 3.
+            
+    gapopen :
+        ui-name : |
+            gapopen
+        short-hint : |
+            Cost to open a gap
+        long-hint : |
+            [blastp, -G] Cost to open a gap. Default value is 11.
+
+    gapextend :
+        ui-name : |
+            gapextend
+        short-hint : |
+            Cost to extend a gap
+        long-hint : |
+            [blastp, -E] Cost to extend a gap. Default value is 1.
+
+    matrix :
+        ui-name : |
+            matrix
+        short-hint : |
+            Scoring matrix name
+        long-hint : |
+            [blastp, -M] Scoring matrix name. Default value is BLOSUM62.
+
+    threshold :
+        ui-name : |
+            threshold
+        short-hint : |
+            Minimum score to add a word to the BLAST lookup table
+        long-hint : |
+            [blastp, -f] Minimum score to add a word to the BLAST lookup table. Default value is 11.
+
+    comp_based_stats :
+        ui-name : |
+            comp_based_stats
+        short-hint : |
+            Use composition-based statistics 
+        long-hint : |
+            [blastp, -C] Use composition-based statistics (0: no composition-based statistics; 1: Composition-based statistics as in NAR 29:2994-3005, 2001; 2: Composition-based score adjustments as in Bioinformatics 21:902-911, 2005, conditioned on sequence properties; 3 - Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally). Default value is 2.
+
+    seg :
+        ui-name : |
+            seg
+        short-hint : |
+             Filter query sequence with SEG
+        long-hint : |
+            [blastp, -F] Filter query sequence with SEG (yes/no). Default value is yes.
+
+    lcase_masking :
+        ui-name : |
+            lcase_masking
+        short-hint : |
+            Use lower case filtering in query and subject sequences
+        long-hint : |
+            [blastp, -U] Use lower case filtering in query and subject sequence(s). Default value is false(0).
+
+    xdrop_gap_final :
+        ui-name : |
+            xdrop_gap_final
+        short-hint : |
+            Heuristic value (in bits) for final gapped alignment
+        long-hint : |
+            [blastp, -Z] Heuristic value (in bits) for final gapped alignment. Default value is 25.
+
+    window_size :
+        ui-name : |
+            window_size
+        short-hint : |
+            Multiple hits window size 
+        long-hint : |
+            [blastp, -A] Multiple hits window size, use 0 to specify 1-hit algorithm. Default value is 40.
+
+    use_sw_tback :
+        ui-name : |
+            use_sw_tback
+        short-hint : |
+            Compute locally optimal Smith-Waterman alignments
+        long-hint : |
+            [blastp, -s] Compute locally optimal Smith-Waterman alignments. Default value is false(0).
+
+    mcl_p :
+        ui-name : |
+            mcl_p
+        short-hint : |
+            Prune number
+        long-hint : |
+            [mcl, -P] Prune number. Default value is 10000.
+
+    mcl_s :
+        ui-name : |
+            mcl_s
+        short-hint : |
+            Selection number
+        long-hint : |
+            [mcl, -S] Selection number. Default value is 1100.
+
+    mcl_r :
+        ui-name : |
+            mcl_r
+        short-hint : |
+            Recovery number
+        long-hint : |
+            [mcl, -R] Recovery number. Default value is 1400.
+
+    mcl_pct :
+        ui-name : |
+            mcl_pct
+        short-hint : |
+            Recovery percentage
+        long-hint : |
+            [mcl, -pct] Recovery percentage. Default value is 90.
+
+    mcl_warn_p :
+        ui-name : |
+            mcl_warn_p
+        short-hint : |
+            Warn if pruning reduces mass to this weight
+        long-hint : |
+            [mcl, -warn-p] Warn if pruning reduces mass to this weight. Default value is 10.
+
+    mcl_warn_factor :
+        ui-name : |
+            mcl_warn_factor
+        short-hint : |
+            Warn if pruning reduces entry count by this value
+        long-hint : |
+            [mcl, -warn-factor] Warn if pruning reduces entry count by this value. Default value is 1000.
+
+    mcl_init_l :
+        ui-name : |
+            mcl_init_l
+        short-hint : |
+            Initial loop length
+        long-hint : |
+            [mcl, -l] Initial loop length. Default value is 0.
+
+    mcl_main_l :
+        ui-name : |
+            mcl_main_l
+        short-hint : |
+            Main loop length
+        long-hint : |
+            [mcl, -L] Main loop length. Default value is 10000.
+
+    mcl_init_i :
+        ui-name : |
+            mcl_init_i
+        short-hint : |
+            Initial inflation
+        long-hint : |
+            [mcl, -i] Initial inflation. Default value is 2.0.
+
+    mcl_main_i :
+        ui-name : |
+            mcl_main_i
+        short-hint : |
+            Main inflation
+        long-hint : |
+            [mcl, -I] Main inflation. Default value is 1.5.
 
 
 description : |

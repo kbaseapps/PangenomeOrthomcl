@@ -63,9 +63,10 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 'source': 'source', 'source_id': 'source_id', 'type': 'type'}
         self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects':
             [{'type': 'KBaseGenomes.ContigSet', 'name': contig_obj_name, 'data': obj}]})
-        genome_fasta_files = ["Escherichia_coli_042_uid161985.faa", "Escherichia_coli_BW2952_uid59391.faa", 
+        genome_fasta_files = ["Escherichia_coli_042_uid161985.faa", 
+                              "Escherichia_coli_BW2952_uid59391.faa", 
                               "Escherichia_coli_K12_MG1655_uid57779.faa"]
-        genomeset_obj = {"description" : "", "elements" : {}}
+        genomeset_obj = {"description": "", "elements": {}}
         for genome_index, genome_file_name in enumerate(genome_fasta_files):
             test_dir = os.path.dirname(os.path.realpath(__file__))
             file_path = test_dir + "/data/" + genome_file_name
@@ -74,29 +75,40 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 id = record.id
                 sequence = str(record.seq)
                 if len(sequence) <= 100:
-                    features.append({"id" : id, "location" : [["1", 0, "+", 0]], "type" : "CDS", 
-                                     "protein_translation" : sequence, "aliases" : [], 
-                                     "annotations" : [], "function" : ""})
-            genome_obj = {"complete" : 0, "contig_ids" : ["1"], "contig_lengths" : [10],
-                          "contigset_ref" : self.getWsName() + "/" + contig_obj_name, 
-                          "dna_size" : 10, "domain" : "Bacteria", "gc_content" : 0.5,
-                          "genetic_code" : 11, "id" : genome_file_name, "md5" : "md5",
-                          "num_contigs" : 1, "scientific_name" : genome_file_name,
-                          "source" : "test folder", "source_id" : "noid", "features" : features}
+                    features.append({"id": id, "location": [["1", 0, "+", 0]], 
+                                     "type": "CDS", "protein_translation": sequence, 
+                                     "aliases": [], "annotations":[], "function": ""})
+            genome_obj = {"complete": 0, "contig_ids": ["1"], "contig_lengths": [10],
+                          "contigset_ref": self.getWsName() + "/" + contig_obj_name, 
+                          "dna_size": 10, "domain": "Bacteria", "gc_content": 0.5,
+                          "genetic_code": 11, "id": genome_file_name, "md5": "md5",
+                          "num_contigs": 1, "scientific_name": genome_file_name,
+                          "source": "test folder", "source_id": "noid", 
+                          "features": features}
             genome_obj_name = "genome." + str(genome_index)
             self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects':
-                    [{'type': 'KBaseGenomes.Genome', 'name': genome_obj_name, 'data': genome_obj}]})
-            genomeset_obj["elements"]["param" + str(genome_index)] = {"ref" :
+                    [{'type': 'KBaseGenomes.Genome', 'name': genome_obj_name, 
+                      'data': genome_obj}]})
+            genomeset_obj["elements"]["param" + str(genome_index)] = {"ref":
                     self.getWsName() + "/" + genome_obj_name}
         genomeset_obj_name = "genomeset.1"
         self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects':
-                [{'type': 'KBaseSearch.GenomeSet', 'name': genomeset_obj_name, 'data': genomeset_obj}]})
-        output_pangenome_name = "pangenome.1"
+                [{'type': 'KBaseSearch.GenomeSet', 'name': genomeset_obj_name, 
+                  'data': genomeset_obj}]})
+        output_name = "pangenome.1"
         ret = self.getImpl().build_pangenome_with_orthomcl(self.getContext(), {
-                "input_genomeset_ref" : self.getWsName() + "/" + genomeset_obj_name,
-                "output_workspace" : self.getWsName(), "output_pangenome_id" : output_pangenome_name})[0]
+                "input_genomeset_ref": self.getWsName() + "/" + genomeset_obj_name,
+                "output_workspace": self.getWsName(), "output_pangenome_id": output_name,
+                "num_descriptions": 100000, "num_alignments": 100000, "evalue": "1e-5",
+                "word_size": 3, "gapopen": 11, "gapextend": 1, "matrix": "BLOSUM62", 
+                "threshold": 11, "comp_based_stats": "2", "xdrop_gap_final": 25, 
+                "window_size": 40, "seg": "", "lcase_masking": 0, "use_sw_tback": 0, 
+                "mcl_p": 10000, "mcl_s": 1100, "mcl_r": 1400, "mcl_pct": 90, 
+                "mcl_warn_p": 10, "mcl_warn_factor": 1000, "mcl_init_l": 0, 
+                "mcl_main_l": 10000, "mcl_init_i": 2.0, "mcl_main_i": 1.5})[0]
         print(ret["output_log"])
-        pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}])[0]['data']
+        pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
+                [0]['data']
         self.assertEqual(len(pangenome["orthologs"]), 350)
         pass
         

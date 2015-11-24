@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * <p>Original spec-file type: BuildPangenomeWithOrthmclResult</p>
  * <pre>
+ * Output results of build_pangenome_with_orthomcl method.
  * One of 'pangenome_ref' and 'error' fields should be defined.
  * </pre>
  * 

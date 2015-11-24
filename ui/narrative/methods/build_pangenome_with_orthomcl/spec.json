@@ -14,13 +14,25 @@
     "parameters": [ 
         {
             "id": "input_genomeset",
-            "optional": false,
+            "optional": true,
             "advanced": false,
             "allow_multiple": false,
             "default_values": [ "" ],
             "field_type": "text",
             "text_options": {
                 "valid_ws_types": [ "KBaseSearch.GenomeSet" ]
+            }
+        },
+        {
+            "id": "input_genomes",
+            "optional": true,
+            "advanced": false,
+            "allow_multiple": true,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseGenomes.Genome" ],
+                "is_output_name":true
             }
         },
         {
@@ -33,6 +45,347 @@
             "text_options": {
                 "valid_ws_types": [ "KBaseGenomes.Pangenome" ],
                 "is_output_name":true
+            }
+        },
+        {
+            "id": "num_descriptions",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int",
+                "min_int" : 1
+            }
+        },
+        {
+            "id": "num_alignments",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int",
+                "min_int" : 1
+            }
+        },
+        {
+            "id": "evalue",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ]
+            }
+        },
+        {
+            "id": "word_size",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int",
+                "min_int" : 2,
+                "max_int" : 7
+            }
+        },
+        {
+            "id": "gapopen",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int",
+                "min_int" : 0
+            }
+        },
+        {
+            "id": "gapextend",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int",
+                "min_int" : 0
+            }
+        },
+        {
+            "id": "matrix",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ]
+            }
+        },
+        {
+            "id": "threshold",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "comp_based_stats",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "dropdown",
+            "dropdown_options": {
+                "options": [
+                    {
+                        "value": "",
+                        "display": "default",
+                        "id": "def",
+                        "ui_name": "default"
+                    },
+                    {
+                        "value": "0",
+                        "display": "0: no composition-based statistics",
+                        "id": "v0",
+                        "ui_name": "0: no composition-based statistics"
+                    },
+                    {
+                        "value": "1",
+                        "display": "1: Composition-based statistics as in NAR 29:2994-3005, 2001",
+                        "id": "v1",
+                        "ui_name": "1: Composition-based statistics as in NAR 29:2994-3005, 2001"
+                    },
+                    {
+                        "value": "2",
+                        "display": "2: Composition-based score adjustments as in Bioinformatics 21:902-911, 2005, conditioned on sequence properties",
+                        "id": "v2",
+                        "ui_name": "2: Composition-based score adjustments as in Bioinformatics 21:902-911, 2005, conditioned on sequence properties"
+                    },
+                    {
+                        "value": "3",
+                        "display": "3 - Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally",
+                        "id": "v3",
+                        "ui_name": "3 - Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "seg",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "dropdown",
+            "dropdown_options": {
+                "options": [
+                    {
+                        "value": "",
+                        "display": "default",
+                        "id": "def",
+                        "ui_name": "default"
+                    },
+                    {
+                        "value": "yes",
+                        "display": "yes",
+                        "id": "yes",
+                        "ui_name": "yes"
+                    },
+                    {
+                        "value": "no",
+                        "display": "no",
+                        "id": "no",
+                        "ui_name": "no"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "lcase_masking",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "checkbox",
+            "checkbox_options":{
+                "checked_value": 1,
+                "unchecked_value": 0
+            }
+        },
+        {
+            "id": "xdrop_gap_final",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "float"
+            }
+        },
+        {
+            "id": "window_size",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int",
+                "min_int" : 1
+            }
+        },
+        {
+            "id": "use_sw_tback",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "checkbox",
+            "checkbox_options":{
+                "checked_value": 1,
+                "unchecked_value": 0
+            }
+        },
+        {
+            "id": "mcl_p",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "mcl_s",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "mcl_r",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "mcl_pct",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "mcl_warn_p",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "mcl_warn_factor",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "mcl_init_l",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "mcl_main_l",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "int"
+            }
+        },
+        {
+            "id": "mcl_init_i",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "float"
+            }
+        },
+        {
+            "id": "mcl_main_i",
+            "optional": true,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ ],
+                "validate_as": "float"
             }
         }
     ],
@@ -48,12 +401,113 @@
                     "target_type_transform": "ref"
                 },
                 {
+                    "input_parameter": "input_genomes",
+                    "target_property": "input_genome_refs",
+                    "target_type_transform": "list<ref>"
+                },
+                {
                     "narrative_system_variable": "workspace",
                     "target_property": "output_workspace"
                 },
                 {
                     "input_parameter": "output_pangenome",
                     "target_property": "output_pangenome_id"
+                },
+                {
+                    "input_parameter": "num_descriptions",
+                    "target_property": "num_descriptions"
+                },
+                {
+                    "input_parameter": "num_alignments",
+                    "target_property": "num_alignments"
+                },
+                {
+                    "input_parameter": "evalue",
+                    "target_property": "evalue"
+                },
+                {
+                    "input_parameter": "word_size",
+                    "target_property": "word_size"
+                },
+                {
+                    "input_parameter": "gapopen",
+                    "target_property": "gapopen"
+                },
+                {
+                    "input_parameter": "gapextend",
+                    "target_property": "gapextend"
+                },
+                {
+                    "input_parameter": "matrix",
+                    "target_property": "matrix"
+                },
+                {
+                    "input_parameter": "threshold",
+                    "target_property": "threshold"
+                },
+                {
+                    "input_parameter": "comp_based_stats",
+                    "target_property": "comp_based_stats"
+                },
+                {
+                    "input_parameter": "seg",
+                    "target_property": "seg"
+                },
+                {
+                    "input_parameter": "lcase_masking",
+                    "target_property": "lcase_masking"
+                },
+                {
+                    "input_parameter": "xdrop_gap_final",
+                    "target_property": "xdrop_gap_final"
+                },
+                {
+                    "input_parameter": "window_size",
+                    "target_property": "window_size"
+                },
+                {
+                    "input_parameter": "use_sw_tback",
+                    "target_property": "use_sw_tback"
+                },
+                {
+                    "input_parameter": "mcl_p",
+                    "target_property": "mcl_p"
+                },
+                {
+                    "input_parameter": "mcl_s",
+                    "target_property": "mcl_s"
+                },
+                {
+                    "input_parameter": "mcl_r",
+                    "target_property": "mcl_r"
+                },
+                {
+                    "input_parameter": "mcl_pct",
+                    "target_property": "mcl_pct"
+                },
+                {
+                    "input_parameter": "mcl_warn_p",
+                    "target_property": "mcl_warn_p"
+                },
+                {
+                    "input_parameter": "mcl_warn_factor",
+                    "target_property": "mcl_warn_factor"
+                },
+                {
+                    "input_parameter": "mcl_init_l",
+                    "target_property": "mcl_init_l"
+                },
+                {
+                    "input_parameter": "mcl_main_l",
+                    "target_property": "mcl_main_l"
+                },
+                {
+                    "input_parameter": "mcl_init_i",
+                    "target_property": "mcl_init_i"
+                },
+                {
+                    "input_parameter": "mcl_main_i",
+                    "target_property": "mcl_main_i"
                 }
             ],
             "output_mapping": [
