@@ -153,7 +153,10 @@ class PangenomeOrthomcl:
                 #######################################################
                 log += "Loading Genome object from workspace for ref [" + genome_ref + \
                         "]\n"
-                genome = ws.get_objects([{'ref': genome_ref}])[0]['data']
+                obj = ws.get_objects([{'ref': genome_ref}])[0]
+                info = obj["info"]
+                genome_ref = str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])
+                genome = obj['data']
                 #######################################################
                 log += "Preparing fasta file for ref [" + genome_ref + "]\n"
                 genome_id = str(genome_pos + 1)
