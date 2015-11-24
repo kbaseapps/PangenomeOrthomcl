@@ -49,14 +49,16 @@ class PangenomeOrthomcl:
     
     def get_param(self, params, param_name, def_value):
         ret = None
-        if param_name in params and len(str(params[param_name])) > 0:
+        if param_name in params and params[param_name] is not None and \
+                len(str(params[param_name])) > 0:
             ret = str(params[param_name])
         else:
             ret = str(def_value)
         return ret
     
     def add_param(self, params, param_name, cli_arg, target_args, bool=False):
-        if param_name in params and len(str(params[param_name])) > 0:
+        if param_name in params and params[param_name] is not None and \
+                len(str(params[param_name])) > 0:
             value = params[param_name]
             if bool:
                 if value == 1:
@@ -71,9 +73,6 @@ class PangenomeOrthomcl:
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
         self.scratch = config['scratch']
-        if os.path.exists(self.scratch):
-            shutil.rmtree(self.scratch)
-        os.makedirs(self.scratch)
         self.workspaceURL = config['workspace-url']
         #END_CONSTRUCTOR
         pass
@@ -84,6 +83,9 @@ class PangenomeOrthomcl:
         #BEGIN build_pangenome_with_orthomcl
         log = ""
         try:
+            if os.path.exists(self.scratch):
+                shutil.rmtree(self.scratch)
+            os.makedirs(self.scratch)
             log += "Starting mysql service\n"
             log = self.add(log, subprocess.Popen(["service", "mysql", "start"], 
                     cwd=self.scratch, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
@@ -120,12 +122,12 @@ class PangenomeOrthomcl:
                     orthomcl_cfg], cwd=self.scratch, stdout=subprocess.PIPE, 
                     stderr=subprocess.PIPE))
             #######################################################
+            token = ctx['token']
+            ws = workspaceService(self.workspaceURL, token=token)
             genomeset = None
-            if "input_genomeset_ref" in params:
+            if "input_genomeset_ref" in params and params["input_genomeset_ref"] is not None:
                 log += "Loading GenomeSet object from workspace\n"
-                token = ctx['token']
-                ws = workspaceService(self.workspaceURL, token=token)
-                genomeset = ws.get_objects([{'ref':params["input_genomeset_ref"]}])[0]['data']
+                genomeset = ws.get_objects([{'ref': params["input_genomeset_ref"]}])[0]['data']
             #######################################################
             log += "Preparing genome refs\n"
             genome_refs = []
@@ -133,7 +135,7 @@ class PangenomeOrthomcl:
                 for param_key in genomeset["elements"]:
                     genome_refs.append(genomeset["elements"][param_key]["ref"])
                 log += "Genome references from genome set: " + ", ".join(genome_refs) + "\n"
-            if "input_genome_refs" in params:
+            if "input_genome_refs" in params and params["input_genome_refs"] is not None:
                 for genome_ref in params["input_genome_refs"]:
                     genome_refs.append(genome_ref)
                 log += "Final list of genome references: " + ", ".join(genome_refs) + "\n"
@@ -276,8 +278,13 @@ class PangenomeOrthomcl:
                          output_obj_name, "orthologs": orthologs, "type": "orthomcl"}
             #######################################################
             log += "Saving pangenome object\n"
+            input_ws_objects = []
+            if "input_genomeset_ref" in params and params["input_genomeset_ref"] is not None:
+                input_ws_objects.append(params["input_genomeset_ref"])
+            if "input_genome_refs" in params and params["input_genome_refs"] is not None:
+                input_ws_objects.extend(params["input_genome_refs"])
             prov = {"service": "PangenomeOrthomcl", "method": "build_pangenome_with_orthomcl",
-                    "service_ver": "0.1", "input_ws_objects": [params["input_genomeset_ref"]], 
+                    "service_ver": "0.1", "input_ws_objects": input_ws_objects, 
                     "description": "Orthologous groups construction using OrthoMCL tool", 
                     "method_params": [params]}
             info = ws.save_objects({"workspace": params["output_workspace"], "objects":

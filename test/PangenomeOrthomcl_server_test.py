@@ -67,6 +67,7 @@ class PangenomeOrthomclTest(unittest.TestCase):
                               "Escherichia_coli_BW2952_uid59391.faa", 
                               "Escherichia_coli_K12_MG1655_uid57779.faa"]
         genomeset_obj = {"description": "", "elements": {}}
+        genome_refs = []
         for genome_index, genome_file_name in enumerate(genome_fasta_files):
             test_dir = os.path.dirname(os.path.realpath(__file__))
             file_path = test_dir + "/data/" + genome_file_name
@@ -91,10 +92,12 @@ class PangenomeOrthomclTest(unittest.TestCase):
                       'data': genome_obj}]})
             genomeset_obj["elements"]["param" + str(genome_index)] = {"ref":
                     self.getWsName() + "/" + genome_obj_name}
+            genome_refs.append(self.getWsName() + "/" + genome_obj_name)
         genomeset_obj_name = "genomeset.1"
         self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects':
                 [{'type': 'KBaseSearch.GenomeSet', 'name': genomeset_obj_name, 
                   'data': genomeset_obj}]})
+        print("Genomeset mode\n")
         output_name = "pangenome.1"
         ret = self.getImpl().build_pangenome_with_orthomcl(self.getContext(), {
                 "input_genomeset_ref": self.getWsName() + "/" + genomeset_obj_name,
@@ -105,7 +108,26 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 "window_size": 40, "seg": "", "lcase_masking": 0, "use_sw_tback": 0, 
                 "mcl_p": 10000, "mcl_s": 1100, "mcl_r": 1400, "mcl_pct": 90, 
                 "mcl_warn_p": 10, "mcl_warn_factor": 1000, "mcl_init_l": 0, 
-                "mcl_main_l": 10000, "mcl_init_i": 2.0, "mcl_main_i": 1.5})[0]
+                "mcl_main_l": 10000, "mcl_init_i": 2.0, "mcl_main_i": 1.5,
+                "input_genome_refs": None})[0]
+        print(ret["output_log"])
+        pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
+                [0]['data']
+        self.assertEqual(len(pangenome["orthologs"]), 350)
+        print("\n")
+        print("Genome list mode\n")
+        output_name = "pangenome.2"
+        ret = self.getImpl().build_pangenome_with_orthomcl(self.getContext(), {
+                "input_genomeset_ref": None,
+                "output_workspace": self.getWsName(), "output_pangenome_id": output_name,
+                "num_descriptions": 100000, "num_alignments": 100000, "evalue": "1e-5",
+                "word_size": 3, "gapopen": 11, "gapextend": 1, "matrix": "BLOSUM62", 
+                "threshold": 11, "comp_based_stats": "2", "xdrop_gap_final": 25, 
+                "window_size": 40, "seg": "", "lcase_masking": 0, "use_sw_tback": 0, 
+                "mcl_p": 10000, "mcl_s": 1100, "mcl_r": 1400, "mcl_pct": 90, 
+                "mcl_warn_p": 10, "mcl_warn_factor": 1000, "mcl_init_l": 0, 
+                "mcl_main_l": 10000, "mcl_init_i": 2.0, "mcl_main_i": 1.5,
+                "input_genome_refs": genome_refs})[0]
         print(ret["output_log"])
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
                 [0]['data']
