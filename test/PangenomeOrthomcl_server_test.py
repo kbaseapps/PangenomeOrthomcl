@@ -21,7 +21,9 @@ class PangenomeOrthomclTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         token = environ.get('KB_AUTH_TOKEN', None)
-        cls.ctx = {'token': token}
+        cls.ctx = {'token': token, 'provenance': [{'service': '${module_name}',
+            'method': 'please_never_use_it_in_production', 'method_params': []}],
+            'authenticated': 1}
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
