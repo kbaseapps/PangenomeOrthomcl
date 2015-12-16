@@ -1,4 +1,4 @@
-FROM kbase/sdkbase:latest
+FROM kbase/kbase:sdkbase.latest
 MAINTAINER KBase Developer
 # -----------------------------------------
 
