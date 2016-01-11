@@ -512,8 +512,8 @@
             ],
             "output_mapping": [
                 {
-                    "service_method_output_path": [0],
-                    "target_property": "output"
+                    "service_method_output_path": [0, "pangenome_ref"],
+                    "target_property": "pangenome_ref"
                 },
                 {
                     "input_parameter": "output_pangenome",
@@ -522,6 +522,18 @@
                 {
                     "narrative_system_variable": "workspace",
                     "target_property": "ws"
+                },
+                {
+                    "service_method_output_path": [0, "report_name"],
+                    "target_property": "report_name"
+                },
+                {
+                    "service_method_output_path": [0, "report_ref"],
+                    "target_property": "report_ref"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "workspace_name"
                 }
             ]
         }

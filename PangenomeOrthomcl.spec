@@ -119,8 +119,9 @@ module PangenomeOrthomcl {
         One of 'pangenome_ref' and 'error' fields should be defined.
     */
     typedef structure {
-        string output_log;
         ws_pangenome_id pangenome_ref;
+        string report_name;
+        string report_ref;
     } BuildPangenomeWithOrthmclResult;
 
     funcdef build_pangenome_with_orthomcl(BuildPangenomeWithOrthmclParams params)

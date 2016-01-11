@@ -112,7 +112,6 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 "mcl_warn_p": 10, "mcl_warn_factor": 1000, "mcl_init_l": 0, 
                 "mcl_main_l": 10000, "mcl_init_i": 2.0, "mcl_main_i": 1.5,
                 "input_genome_refs": [None]})[0]
-        print(ret["output_log"])
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
                 [0]['data']
         self.assertEqual(len(pangenome["orthologs"]), 350)
@@ -130,7 +129,6 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 "mcl_warn_p": 10, "mcl_warn_factor": 1000, "mcl_init_l": 0, 
                 "mcl_main_l": 10000, "mcl_init_i": 2.0, "mcl_main_i": 1.5,
                 "input_genome_refs": genome_refs})[0]
-        print(ret["output_log"])
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
                 [0]['data']
         self.assertEqual(len(pangenome["orthologs"]), 350)

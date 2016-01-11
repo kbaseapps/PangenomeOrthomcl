@@ -5,6 +5,7 @@ import os
 import shutil
 import traceback
 import json
+import uuid
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -105,8 +106,8 @@ class PangenomeOrthomcl:
             db.close()
             #######################################################
             log = self.log_line(log, "Preparing orthomcl config file")
-            orthomcl_cfg = self.scratch + '/orthomcl.cfg'
-            f = open(orthomcl_cfg, 'w')
+            orthomcl_cfg = self.scratch + "/orthomcl.cfg"
+            f = open(orthomcl_cfg, "w")
             f.write("dbVendor=mysql\n");
             f.write("dbConnectString=dbi:mysql:orthomcl:mysql_local_infile=1:localhost:" + 
                     "3306\n")
@@ -128,12 +129,12 @@ class PangenomeOrthomcl:
                     orthomcl_cfg], cwd=self.scratch, stdout=subprocess.PIPE, 
                     stderr=subprocess.PIPE))
             #######################################################
-            token = ctx['token']
+            token = ctx["token"]
             ws = workspaceService(self.workspaceURL, token=token)
             genomeset = None
             if "input_genomeset_ref" in params and params["input_genomeset_ref"] is not None:
                 log = self.log_line(log, "Loading GenomeSet object from workspace")
-                genomeset = ws.get_objects([{'ref': params["input_genomeset_ref"]}])[0]['data']
+                genomeset = ws.get_objects([{"ref": params["input_genomeset_ref"]}])[0]["data"]
             #######################################################
             log = self.log_line(log, "Preparing genome refs")
             genome_refs = []
@@ -147,10 +148,10 @@ class PangenomeOrthomcl:
                         genome_refs.append(genome_ref)
                 log = self.log_line(log, "Final list of genome references: " + ", ".join(genome_refs))
             if len(genome_refs) < 2:
-                raise ValueError('Number of genomes should be more than 1')
+                raise ValueError("Number of genomes should be more than 1")
             if len(genome_refs) > 20:
-                raise ValueError('Number of genomes exceeds 20, which is too many for ' +
-                'all-against-all blastp')
+                raise ValueError("Number of genomes exceeds 20, which is too many for " +
+                "all-against-all blastp")
             feature_info = {}
             compliant_fasta_dir = self.scratch + "/compliantFasta"
             os.makedirs(compliant_fasta_dir)
@@ -158,17 +159,17 @@ class PangenomeOrthomcl:
                 #######################################################
                 log = self.log_line(log, "Loading Genome object from workspace for ref [" + 
                     genome_ref + "]")
-                obj = ws.get_objects([{'ref': genome_ref}])[0]
+                obj = ws.get_objects([{"ref": genome_ref}])[0]
                 info = obj["info"]
                 genome_ref = str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])
-                genome = obj['data']
+                genome = obj["data"]
                 #######################################################
                 log = self.log_line(log, "Preparing fasta file for ref [" + genome_ref + "]")
                 genome_id = str(genome_pos + 1)
                 records = []
-                for feature_pos, feature in enumerate(genome['features']):
-                    if feature['type'] == 'CDS' and 'protein_translation' in feature:
-                        sequence = feature['protein_translation']
+                for feature_pos, feature in enumerate(genome["features"]):
+                    if feature["type"] == "CDS" and "protein_translation" in feature:
+                        sequence = feature["protein_translation"]
                         id = str(feature_pos + 1)
                         record = SeqRecord(Seq(sequence), id=id, description="")
                         records.append(record)
@@ -278,8 +279,8 @@ class PangenomeOrthomcl:
                     words = line.rstrip().split(" ")
                     for id in words[1:]:
                         feature = feature_info[id]
-                        items.append([feature['fid'], feature['fpos'], feature['gref']])
-                        func = feature['func']
+                        items.append([feature["fid"], feature["fpos"], feature["gref"]])
+                        func = feature["func"]
                         if func is not None and len(func) > len(function):
                             function = func
                     orthologs.append({"function": function, "id": cluster_id, 
@@ -296,20 +297,30 @@ class PangenomeOrthomcl:
                     if genome_ref is not None:
                         input_ws_objects.append(genome_ref)
             provenance = None
-            if 'provenance' in ctx:
-                provenance = ctx['provenance']
+            if "provenance" in ctx:
+                provenance = ctx["provenance"]
             else:
                 log = self.log_line(log, "Creating provenance data")
                 provenance = [{"service": "PangenomeOrthomcl", "method": 
                         "build_pangenome_with_orthomcl", "method_params": [params]}]
-            provenance[0]['input_ws_objects'] = input_ws_objects
-            provenance[0]['service_ver'] = "0.1"
-            provenance[0]['description'] = "Orthologous groups construction using OrthoMCL tool"
+            provenance[0]["input_ws_objects"] = input_ws_objects
+            provenance[0]["service_ver"] = "0.2"
+            provenance[0]["description"] = "Orthologous groups construction using OrthoMCL tool"
             info = ws.save_objects({"workspace": params["output_workspace"], "objects":
                 [{"type": "KBaseGenomes.Pangenome", "name": output_obj_name, 
-                  'data': pangenome, "provenance": provenance}]})[0]
-            returnVal = {"output_log": log, "pangenome_ref": str(info[6]) + "/" + 
-                         str(info[0]) + "/" + str(info[4])}
+                  "data": pangenome, "provenance": provenance}]})[0]
+            pangenome_ref = str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])
+            report = "Input genomes: " + str(len(genome_refs)) + "\n" + \
+                "Output orthologs: " + str(len(orthologs)) + "\n"
+            report_obj = {"objects_created": [{"ref": pangenome_ref, 
+                "description": "Pangenome object"}], "text_message": report}
+            report_name = "orthomcl_report_" + str(hex(uuid.getnode()))
+            report_info = ws.save_objects({"workspace": params["output_workspace"],
+                "objects": [{"type": "KBaseReport.Report", "data": report_obj, 
+                    "name": report_name, "meta": {}, "hidden": 1, "provenance": provenance}]})[0]
+            returnVal = {"pangenome_ref": pangenome_ref, 
+                         "report_name": report_name, "report_ref": str(report_info[6]) + "/" + 
+                         str(report_info[0]) + "/" + str(report_info[4])}
         except Exception, err:
             log = self.log_line(log, traceback.format_exc())
             raise ValueError(log)
