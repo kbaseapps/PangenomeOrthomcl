@@ -6,7 +6,7 @@ tooltip: |
 	Perform OrthoMCL orthologous groups construction
 screenshots: []
 
-icon: icon.png
+icon: orthomcl-purple.png
 
 #
 # define a set of similar methods that might be useful to the user
