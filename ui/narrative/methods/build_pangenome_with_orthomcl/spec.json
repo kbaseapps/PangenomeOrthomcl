@@ -6,7 +6,7 @@
     ],
     "contact": "rsutormin@lbl.gov",
     "visible": true,
-    "categories": ["active"],
+    "categories": ["active","comparative_genomics"],
     "widgets": {
         "input": null,
         "output": "kbasePanGenome"
