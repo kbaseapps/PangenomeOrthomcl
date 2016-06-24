@@ -271,9 +271,12 @@ class PangenomeOrthomcl:
             log = self.log_line(log, "Parsing groups file")
             output_obj_name = params["output_pangenome_id"]
             orthologs = [];
+            ids_in_orths = {};
+            cluster_ind = 0
             with open(groups_file, "r") as infile:
                 for line_pos, line in enumerate(infile.readlines()):
-                    cluster_id = "cluster" + str(line_pos + 1)
+                    cluster_ind = line_pos + 1
+                    cluster_id = "cluster" + str(cluster_ind)
                     function = ""
                     items = []
                     words = line.rstrip().split(" ")
@@ -283,12 +286,29 @@ class PangenomeOrthomcl:
                         func = feature["func"]
                         if func is not None and len(func) > len(function):
                             function = func
+                        ids_in_orths[id] = True
                     orthologs.append({"function": function, "id": cluster_id, 
                                       "orthologs": items})
-            pangenome = {"genome_refs": genome_refs, "id": output_obj_name, "name": 
-                         output_obj_name, "orthologs": orthologs, "type": "orthomcl"}
+            #######################################################
+            log = self.log_line(log, "Adding single-gene families (they're not reported " + 
+                                "by OrthoMCL)")
+            singles = 0
+            for id in feature_info:
+                if id in ids_in_orths:
+                    continue
+                cluster_ind += 1
+                singles += 1
+                cluster_id = "cluster" + str(cluster_ind)
+                feature = feature_info[id]
+                function = feature["func"]
+                items = [[feature["fid"], feature["fpos"], feature["gref"]]]
+                orthologs.append({"function": function, "id": cluster_id, 
+                                      "orthologs": items})
+            log = self.log_line(log, str(singles) + " single-gene families were added") 
             #######################################################
             log = self.log_line(log, "Saving pangenome object")
+            pangenome = {"genome_refs": genome_refs, "id": output_obj_name, "name": 
+                         output_obj_name, "orthologs": orthologs, "type": "orthomcl"}
             input_ws_objects = []
             if "input_genomeset_ref" in params and params["input_genomeset_ref"] is not None:
                 input_ws_objects.append(params["input_genomeset_ref"])
@@ -296,15 +316,8 @@ class PangenomeOrthomcl:
                 for genome_ref in params["input_genome_refs"]:
                     if genome_ref is not None:
                         input_ws_objects.append(genome_ref)
-            provenance = None
-            if "provenance" in ctx:
-                provenance = ctx["provenance"]
-            else:
-                log = self.log_line(log, "Creating provenance data")
-                provenance = [{"service": "PangenomeOrthomcl", "method": 
-                        "build_pangenome_with_orthomcl", "method_params": [params]}]
+            provenance = ctx["provenance"]
             provenance[0]["input_ws_objects"] = input_ws_objects
-            provenance[0]["service_ver"] = "0.2"
             provenance[0]["description"] = "Orthologous groups construction using OrthoMCL tool"
             info = ws.save_objects({"workspace": params["output_workspace"], "objects":
                 [{"type": "KBaseGenomes.Pangenome", "name": output_obj_name, 

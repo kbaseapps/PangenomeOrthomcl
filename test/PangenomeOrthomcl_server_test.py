@@ -70,6 +70,7 @@ class PangenomeOrthomclTest(unittest.TestCase):
                               "Escherichia_coli_K12_MG1655_uid57779.faa"]
         genomeset_obj = {"description": "", "elements": {}}
         genome_refs = []
+        genome_feature_counts = {}
         for genome_index, genome_file_name in enumerate(genome_fasta_files):
             test_dir = os.path.dirname(os.path.realpath(__file__))
             file_path = test_dir + "/data/" + genome_file_name
@@ -89,9 +90,11 @@ class PangenomeOrthomclTest(unittest.TestCase):
                           "source": "test folder", "source_id": "noid", 
                           "features": features}
             genome_obj_name = "genome." + str(genome_index)
-            self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects':
-                    [{'type': 'KBaseGenomes.Genome', 'name': genome_obj_name, 
-                      'data': genome_obj}]})
+            info = self.getWsClient().save_objects({'workspace': self.getWsName(), 
+                    'objects': [{'type': 'KBaseGenomes.Genome', 'name': genome_obj_name, 
+                    'data': genome_obj}]})[0]
+            full_ref = str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])
+            genome_feature_counts[full_ref] = len(features)
             genomeset_obj["elements"]["param" + str(genome_index)] = {"ref":
                     self.getWsName() + "/" + genome_obj_name}
             genome_refs.append(self.getWsName() + "/" + genome_obj_name)
@@ -114,7 +117,7 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 "input_genome_refs": [None]})[0]
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
                 [0]['data']
-        self.assertEqual(len(pangenome["orthologs"]), 350)
+        self.check_resutls(pangenome, genome_feature_counts)
         print("\n")
         print("Genome list mode\n")
         output_name = "pangenome.2"
@@ -131,6 +134,29 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 "input_genome_refs": genome_refs})[0]
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
                 [0]['data']
-        self.assertEqual(len(pangenome["orthologs"]), 350)
+        self.check_resutls(pangenome, genome_feature_counts)
         pass
-        
+    
+    def check_resutls(self, pangenome, genome_feature_counts):
+        self.assertEqual(len(pangenome["orthologs"]), 737)
+        full_orth_count = 0
+        for orth in pangenome["orthologs"]:
+            if len(orth["orthologs"]) > 1:
+                full_orth_count += 1
+        self.assertEqual(full_orth_count, 350)
+        for genome_ref in genome_feature_counts:
+            expected_count = genome_feature_counts[genome_ref]
+            single_feature_counts = 0
+            full_feature_count = 0
+            for orth in pangenome["orthologs"]:
+                is_single = len(orth["orthologs"]) == 1
+                for feat in orth["orthologs"]:
+                    if genome_ref == feat[2]:
+                        if is_single:
+                            single_feature_counts += 1
+                        else:
+                            full_feature_count += 1
+            #print("Genome " + genome_ref + " expected=" + str(expected_count) + ", " +
+            #      "actual=" + str(single_feature_counts + full_feature_count) + " (" +
+            #      str(single_feature_counts) + "+" + str(full_feature_count) + ")")
+            self.assertEqual(single_feature_counts + full_feature_count, expected_count)
