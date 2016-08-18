@@ -150,8 +150,8 @@ class PangenomeOrthomcl:
             if len(genome_refs) < 2:
                 raise ValueError("Number of genomes should be more than 1")
             if len(genome_refs) > 20:
-                raise ValueError("Number of genomes exceeds 20, which is too many for " +
-                "all-against-all blastp")
+                log = self.log_line(log, "WARNING! Number of genomes exceeds 20, which can make " +
+                "all-against-all blastp working unexpectedly long.")
             feature_info = {}
             compliant_fasta_dir = self.scratch + "/compliantFasta"
             os.makedirs(compliant_fasta_dir)
