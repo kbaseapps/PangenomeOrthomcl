@@ -78,10 +78,11 @@ class PangenomeOrthomclTest(unittest.TestCase):
             for record in SeqIO.parse(file_path, "fasta"):
                 id = record.id
                 sequence = str(record.seq)
+                descr = record.description
                 if len(sequence) <= 100:
                     features.append({"id": id, "location": [["1", 0, "+", 0]], 
                                      "type": "CDS", "protein_translation": sequence, 
-                                     "aliases": [], "annotations":[], "function": ""})
+                                     "aliases": [], "annotations":[], "function": descr})
             genome_obj = {"complete": 0, "contig_ids": ["1"], "contig_lengths": [10],
                           "contigset_ref": self.getWsName() + "/" + contig_obj_name, 
                           "dna_size": 10, "domain": "Bacteria", "gc_content": 0.5,
@@ -140,10 +141,14 @@ class PangenomeOrthomclTest(unittest.TestCase):
     def check_resutls(self, pangenome, genome_feature_counts):
         self.assertEqual(len(pangenome["orthologs"]), 737)
         full_orth_count = 0
+        function_count = 0
         for orth in pangenome["orthologs"]:
             if len(orth["orthologs"]) > 1:
                 full_orth_count += 1
+            if len(orth["function"]) > 0:
+                function_count += 1
         self.assertEqual(full_orth_count, 350)
+        self.assertEqual(function_count, 737)
         for genome_ref in genome_feature_counts:
             expected_count = genome_feature_counts[genome_ref]
             single_feature_counts = 0

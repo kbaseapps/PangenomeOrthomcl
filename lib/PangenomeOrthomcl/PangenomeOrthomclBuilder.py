@@ -9,6 +9,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein
 from biokbase.workspace.client import Workspace as workspaceService
+from GenomeAnnotationAPI.GenomeAnnotationAPIClient import GenomeAnnotationAPI
 
 class PangenomeOrthomclBuilder:
     '''
@@ -129,25 +130,33 @@ class PangenomeOrthomclBuilder:
         for genome_pos, genome_ref in enumerate(genome_refs):
             ############################# Genome loading ##########################
             self.log_line("Loading Genome object from workspace for ref [" + 
-                genome_ref + "]")
-            obj = self.ws.get_objects([{"ref": genome_ref}])[0]
-            info = obj["info"]
+                          genome_ref + "]")
+            info = self.ws.get_object_info_new({"objects": [{"ref": genome_ref}]})[0]
             genome_ref = str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])
-            genome = obj["data"]
+            gaapi = GenomeAnnotationAPI(os.environ['SDK_CALLBACK_URL'], token=self.token)
+            genome_combined = gaapi.get_combined_data({"ref": genome_ref, "exclude_genes": 1, 
+                                                       "exclude_summary": 1})
+            cds_map = genome_combined["feature_by_id_by_type"][genome_combined["cds_type"]]
+            protein_map = genome_combined["protein_by_cds_id"]
+            cds_ids = list(cds_map.keys())
             ############################# Features + Fasta ##########################
             self.log_line("Preparing fasta file for ref [" + genome_ref + "]")
             genome_id = str(genome_pos + 1)
             records = []
-            for feature_pos, feature in enumerate(genome["features"]):
-                if feature["type"] == "CDS" and "protein_translation" in feature:
-                    sequence = feature["protein_translation"]
+            for feature_pos, feature_id in enumerate(cds_ids):
+                cds = cds_map[feature_id]
+                protein = protein_map[feature_id]
+                if "protein_amino_acid_sequence" in protein:
+                    sequence = protein["protein_amino_acid_sequence"]
                     id = str(feature_pos + 1)
                     record = SeqRecord(Seq(sequence), id=id, description="")
                     records.append(record)
                     func = None
-                    if "function" in feature:
-                        func = feature["function"]
-                    feature_info[genome_id + "|" + id] = {"fid": feature["id"], "fpos": 
+                    if "protein_function" in protein:
+                        func = protein["protein_function"]
+                    if ((not func) or len(func) == 0) and "feature_function" in cds:
+                        func = cds["feature_function"]
+                    feature_info[genome_id + "|" + id] = {"fid": feature_id, "fpos": 
                             feature_pos, "gref": genome_ref, "func": func}
             fasta_file = self.scratch + "/" + genome_id + ".fasta"
             SeqIO.write(records, fasta_file, "fasta")
