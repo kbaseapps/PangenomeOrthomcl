@@ -145,6 +145,8 @@ class PangenomeOrthomclBuilder:
             records = []
             for feature_pos, feature_id in enumerate(cds_ids):
                 cds = cds_map[feature_id]
+                if feature_id not in protein_map:
+                    continue
                 protein = protein_map[feature_id]
                 if "protein_amino_acid_sequence" in protein:
                     sequence = protein["protein_amino_acid_sequence"]
