@@ -49,7 +49,7 @@ parameters :
         short-hint : |
             A list of all distinct protein families identified in input genome set
         long-hint  : |
-            A list of all distinct protein families identified by OrthoMCL tool in a set of input genome sequences, as well as the IDs of the proteins present in each family
+            A list of all distinct protein families identified by OrthoMCL in a set of input genome sequences, as well as the IDs of the proteins present in each family
 
     num_descriptions :
         ui-name : |
@@ -65,8 +65,7 @@ parameters :
         short-hint : |
             Store alignments for this number of database sequences
         long-hint : |
-            [blastp, -b] Store alignments for this number of 
-            database sequences. Default value is 100000.
+            [blastp, -b] Store alignments for this number of database sequences. Default value is 100000.
             
     evalue :
         ui-name : |
@@ -122,7 +121,7 @@ parameters :
         short-hint : |
             Use composition-based statistics 
         long-hint : |
-            [blastp, -C] Use composition-based statistics (0: no composition-based statistics; 1: Composition-based statistics as in NAR 29:2994-3005, 2001; 2: Composition-based score adjustments as in Bioinformatics 21:902-911, 2005, conditioned on sequence properties; 3 - Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally). Default value is 2.
+            [blastp, -C] Use composition-based statistics (0: no composition-based statistics; 1: composition-based statistics as in NAR 29:2994-3005, 2001; 2: Composition-based score adjustments as in Bioinformatics 21:902-911, 2005, conditioned on sequence properties; 3 - Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally). Default value is 2.
 
     seg :
         ui-name : |
@@ -246,5 +245,6 @@ parameters :
 
 
 description : |
-	<p>This is a package wrapping OrthoMCL tool in KBase docker container. Input is set of genomes, output is Pangenome object.</p>
+	<p>OrthoMCL is a genome-scale algorithm for grouping orthologous protein sequences. It provides not only groups shared by two or more species/genomes, but also groups representing species-specific gene expansion families. So it serves as an important utility for automated eukaryotic genome annotation.</p>
+	<p>The input to OrthoMCL is a set of genomes and a list of genomes; the output is a Pangenome object.</p>
 	<p>Li Li, Christian J. Stoeckert, Jr., and David S. Roos. OrthoMCL: Identification of Ortholog Groups for Eukaryotic Genomes. Genome Res. 2003 13: 2178-2189.</p>
