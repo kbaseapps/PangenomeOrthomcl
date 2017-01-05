@@ -35,7 +35,6 @@ class PangenomeOrthomcl:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN build_pangenome_with_orthomcl
-        print(str(ctx["provenance"]))
         try:
             runner = PangenomeOrthomclBuilder(self.scratch, self.workspaceURL,
                                               params, ctx["token"], ctx["provenance"])
