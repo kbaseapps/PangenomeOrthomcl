@@ -14,6 +14,8 @@ from Bio.Alphabet import generic_protein
 
 from biokbase.workspace.client import Workspace as workspaceService
 from PangenomeOrthomcl.PangenomeOrthomclImpl import PangenomeOrthomcl
+from PangenomeOrthomcl.PangenomeOrthomclServer import MethodContext
+from PangenomeOrthomcl.authclient import KBaseAuth as _KBaseAuth
 
 
 class PangenomeOrthomclTest(unittest.TestCase):
@@ -21,15 +23,25 @@ class PangenomeOrthomclTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         token = environ.get('KB_AUTH_TOKEN', None)
-        cls.ctx = {'token': token, 'provenance': [{'service': '${module_name}',
-            'method': 'please_never_use_it_in_production', 'method_params': []}],
-            'authenticated': 1}
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
         config.read(config_file)
         for nameval in config.items('PangenomeOrthomcl'):
             cls.cfg[nameval[0]] = nameval[1]
+        authServiceUrl = cls.cfg.get('auth-service-url',
+                "https://kbase.us/services/authorization/Sessions/Login")
+        auth_client = _KBaseAuth(authServiceUrl)
+        user_id = auth_client.get_user(token)
+        cls.ctx = MethodContext(None)
+        cls.ctx.update({'token': token,
+                        'user_id': user_id,
+                        'provenance': [
+                            {'service': 'NarrativeService',
+                             'method': 'please_never_use_it_in_production',
+                             'method_params': []
+                             }],
+                        'authenticated': 1})
         cls.wsURL = cls.cfg['workspace-url']
         cls.wsClient = workspaceService(cls.wsURL, token=token)
         cls.serviceImpl = PangenomeOrthomcl(cls.cfg)

@@ -157,8 +157,9 @@ workspace is a string
 ws_pangenome_id is a string
 boolean is an int
 BuildPangenomeWithOrthmclResult is a reference to a hash where the following keys are defined:
-	output_log has a value which is a string
 	pangenome_ref has a value which is a PangenomeOrthomcl.ws_pangenome_id
+	report_name has a value which is a string
+	report_ref has a value which is a string
 
 </pre>
 
@@ -203,8 +204,9 @@ workspace is a string
 ws_pangenome_id is a string
 boolean is an int
 BuildPangenomeWithOrthmclResult is a reference to a hash where the following keys are defined:
-	output_log has a value which is a string
 	pangenome_ref has a value which is a PangenomeOrthomcl.ws_pangenome_id
+	report_name has a value which is a string
+	report_ref has a value which is a string
 
 
 =end text
@@ -240,9 +242,10 @@ BuildPangenomeWithOrthmclResult is a reference to a hash where the following key
 	}
     }
 
-    my $result = $self->{client}->call($self->{url}, $self->{headers}, {
-	method => "PangenomeOrthomcl.build_pangenome_with_orthomcl",
-	params => \@args,
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "PangenomeOrthomcl.build_pangenome_with_orthomcl",
+	    params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
@@ -263,6 +266,36 @@ BuildPangenomeWithOrthmclResult is a reference to a hash where the following key
 }
  
   
+sub status
+{
+    my($self, @args) = @_;
+    if ((my $n = @args) != 0) {
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function status (received $n, expecting 0)");
+    }
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+        method => "PangenomeOrthomcl.status",
+        params => \@args,
+    });
+    if ($result) {
+        if ($result->is_error) {
+            Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'status',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+        } else {
+            return wantarray ? @{$result->result} : $result->result->[0];
+        }
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method status",
+                        status_line => $self->{client}->status_line,
+                        method_name => 'status',
+                       );
+    }
+}
+   
 
 sub version {
     my ($self) = @_;
@@ -635,8 +668,9 @@ One of 'pangenome_ref' and 'error' fields should be defined.
 
 <pre>
 a reference to a hash where the following keys are defined:
-output_log has a value which is a string
 pangenome_ref has a value which is a PangenomeOrthomcl.ws_pangenome_id
+report_name has a value which is a string
+report_ref has a value which is a string
 
 </pre>
 
@@ -645,8 +679,9 @@ pangenome_ref has a value which is a PangenomeOrthomcl.ws_pangenome_id
 =begin text
 
 a reference to a hash where the following keys are defined:
-output_log has a value which is a string
 pangenome_ref has a value which is a PangenomeOrthomcl.ws_pangenome_id
+report_name has a value which is a string
+report_ref has a value which is a string
 
 
 =end text
