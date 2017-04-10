@@ -14,6 +14,8 @@ from Bio.Alphabet import generic_protein
 
 from biokbase.workspace.client import Workspace as workspaceService
 from PangenomeOrthomcl.PangenomeOrthomclImpl import PangenomeOrthomcl
+from PangenomeOrthomcl.PangenomeOrthomclServer import MethodContext
+from PangenomeOrthomcl.authclient import KBaseAuth as _KBaseAuth
 
 
 class PangenomeOrthomclTest(unittest.TestCase):
@@ -21,15 +23,25 @@ class PangenomeOrthomclTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         token = environ.get('KB_AUTH_TOKEN', None)
-        cls.ctx = {'token': token, 'provenance': [{'service': '${module_name}',
-            'method': 'please_never_use_it_in_production', 'method_params': []}],
-            'authenticated': 1}
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
         config.read(config_file)
         for nameval in config.items('PangenomeOrthomcl'):
             cls.cfg[nameval[0]] = nameval[1]
+        authServiceUrl = cls.cfg.get('auth-service-url',
+                "https://kbase.us/services/authorization/Sessions/Login")
+        auth_client = _KBaseAuth(authServiceUrl)
+        user_id = auth_client.get_user(token)
+        cls.ctx = MethodContext(None)
+        cls.ctx.update({'token': token,
+                        'user_id': user_id,
+                        'provenance': [
+                            {'service': 'NarrativeService',
+                             'method': 'please_never_use_it_in_production',
+                             'method_params': []
+                             }],
+                        'authenticated': 1})
         cls.wsURL = cls.cfg['workspace-url']
         cls.wsClient = workspaceService(cls.wsURL, token=token)
         cls.serviceImpl = PangenomeOrthomcl(cls.cfg)
@@ -70,6 +82,7 @@ class PangenomeOrthomclTest(unittest.TestCase):
                               "Escherichia_coli_K12_MG1655_uid57779.faa"]
         genomeset_obj = {"description": "", "elements": {}}
         genome_refs = []
+        genome_feature_counts = {}
         for genome_index, genome_file_name in enumerate(genome_fasta_files):
             test_dir = os.path.dirname(os.path.realpath(__file__))
             file_path = test_dir + "/data/" + genome_file_name
@@ -77,10 +90,11 @@ class PangenomeOrthomclTest(unittest.TestCase):
             for record in SeqIO.parse(file_path, "fasta"):
                 id = record.id
                 sequence = str(record.seq)
+                descr = record.description
                 if len(sequence) <= 100:
                     features.append({"id": id, "location": [["1", 0, "+", 0]], 
                                      "type": "CDS", "protein_translation": sequence, 
-                                     "aliases": [], "annotations":[], "function": ""})
+                                     "aliases": [], "annotations":[], "function": descr})
             genome_obj = {"complete": 0, "contig_ids": ["1"], "contig_lengths": [10],
                           "contigset_ref": self.getWsName() + "/" + contig_obj_name, 
                           "dna_size": 10, "domain": "Bacteria", "gc_content": 0.5,
@@ -89,9 +103,11 @@ class PangenomeOrthomclTest(unittest.TestCase):
                           "source": "test folder", "source_id": "noid", 
                           "features": features}
             genome_obj_name = "genome." + str(genome_index)
-            self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects':
-                    [{'type': 'KBaseGenomes.Genome', 'name': genome_obj_name, 
-                      'data': genome_obj}]})
+            info = self.getWsClient().save_objects({'workspace': self.getWsName(), 
+                    'objects': [{'type': 'KBaseGenomes.Genome', 'name': genome_obj_name, 
+                    'data': genome_obj}]})[0]
+            full_ref = str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])
+            genome_feature_counts[full_ref] = len(features)
             genomeset_obj["elements"]["param" + str(genome_index)] = {"ref":
                     self.getWsName() + "/" + genome_obj_name}
             genome_refs.append(self.getWsName() + "/" + genome_obj_name)
@@ -114,7 +130,7 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 "input_genome_refs": [None]})[0]
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
                 [0]['data']
-        self.assertEqual(len(pangenome["orthologs"]), 350)
+        self.check_resutls(pangenome, genome_feature_counts)
         print("\n")
         print("Genome list mode\n")
         output_name = "pangenome.2"
@@ -131,6 +147,33 @@ class PangenomeOrthomclTest(unittest.TestCase):
                 "input_genome_refs": genome_refs})[0]
         pangenome = self.getWsClient().get_objects([{'ref': ret["pangenome_ref"]}]) \
                 [0]['data']
-        self.assertEqual(len(pangenome["orthologs"]), 350)
+        self.check_resutls(pangenome, genome_feature_counts)
         pass
-        
+    
+    def check_resutls(self, pangenome, genome_feature_counts):
+        self.assertEqual(len(pangenome["orthologs"]), 737)
+        full_orth_count = 0
+        function_count = 0
+        for orth in pangenome["orthologs"]:
+            if len(orth["orthologs"]) > 1:
+                full_orth_count += 1
+            if len(orth["function"]) > 0:
+                function_count += 1
+        self.assertEqual(full_orth_count, 350)
+        self.assertEqual(function_count, 737)
+        for genome_ref in genome_feature_counts:
+            expected_count = genome_feature_counts[genome_ref]
+            single_feature_counts = 0
+            full_feature_count = 0
+            for orth in pangenome["orthologs"]:
+                is_single = len(orth["orthologs"]) == 1
+                for feat in orth["orthologs"]:
+                    if genome_ref == feat[2]:
+                        if is_single:
+                            single_feature_counts += 1
+                        else:
+                            full_feature_count += 1
+            #print("Genome " + genome_ref + " expected=" + str(expected_count) + ", " +
+            #      "actual=" + str(single_feature_counts + full_feature_count) + " (" +
+            #      str(single_feature_counts) + "+" + str(full_feature_count) + ")")
+            self.assertEqual(single_feature_counts + full_feature_count, expected_count)

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.JsonClientCaller;
 import us.kbase.common.service.JsonClientException;
@@ -20,6 +21,7 @@ import us.kbase.common.service.UnauthorizedException;
  */
 public class PangenomeOrthomclClient {
     private JsonClientCaller caller;
+    private String serviceVersion = null;
 
 
     /** Constructs a client with a custom URL and no user credentials.
@@ -49,6 +51,20 @@ public class PangenomeOrthomclClient {
      */
     public PangenomeOrthomclClient(URL url, String user, String password) throws UnauthorizedException, IOException {
         caller = new JsonClientCaller(url, user, password);
+    }
+
+    /** Constructs a client with a custom URL
+     * and a custom authorization service URL.
+     * @param url the URL of the service.
+     * @param user the user name.
+     * @param password the password for the user name.
+     * @param auth the URL of the authorization server.
+     * @throws UnauthorizedException if the credentials are not valid.
+     * @throws IOException if an IOException occurs when checking the user's
+     * credentials.
+     */
+    public PangenomeOrthomclClient(URL url, String user, String password, URL auth) throws UnauthorizedException, IOException {
+        caller = new JsonClientCaller(url, user, password, auth);
     }
 
     /** Get the token this client uses to communicate with the server.
@@ -138,6 +154,14 @@ public class PangenomeOrthomclClient {
         caller.setFileForNextRpcResponse(f);
     }
 
+    public String getServiceVersion() {
+        return this.serviceVersion;
+    }
+
+    public void setServiceVersion(String newValue) {
+        this.serviceVersion = newValue;
+    }
+
     /**
      * <p>Original spec-file function name: build_pangenome_with_orthomcl</p>
      * <pre>
@@ -151,7 +175,14 @@ public class PangenomeOrthomclClient {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<BuildPangenomeWithOrthmclResult>> retType = new TypeReference<List<BuildPangenomeWithOrthmclResult>>() {};
-        List<BuildPangenomeWithOrthmclResult> res = caller.jsonrpcCall("PangenomeOrthomcl.build_pangenome_with_orthomcl", args, retType, true, true, jsonRpcContext);
+        List<BuildPangenomeWithOrthmclResult> res = caller.jsonrpcCall("PangenomeOrthomcl.build_pangenome_with_orthomcl", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};
+        List<Map<String, Object>> res = caller.jsonrpcCall("PangenomeOrthomcl.status", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 }

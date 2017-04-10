@@ -1,16 +1,7 @@
+# -*- coding: utf-8 -*-
 #BEGIN_HEADER
-import subprocess
-import MySQLdb
-import os
-import shutil
 import traceback
-import json
-import uuid
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-from biokbase.workspace.client import Workspace as workspaceService
+from PangenomeOrthomcl.PangenomeOrthomclBuilder import PangenomeOrthomclBuilder
 #END_HEADER
 
 
@@ -23,55 +14,17 @@ class PangenomeOrthomcl:
     A KBase module: PangenomeOrthomcl
     '''
 
-    ######## WARNING FOR GEVENT USERS #######
+    ######## WARNING FOR GEVENT USERS ####### noqa
     # Since asynchronous IO can lead to methods - even the same method -
     # interrupting each other, you must be *very* careful when using global
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
-    #########################################
+    ######################################### noqa
+    VERSION = "0.0.6"
+    GIT_URL = "https://github.com/kbaseapps/PangenomeOrthomcl"
+    GIT_COMMIT_HASH = "3c1358e049e76c7581484cc8fa358ae8a57b0fd7"
+
     #BEGIN_CLASS_HEADER
-    def log_line(self, log, line):
-        log += line + "\n"
-        print(line)
-        return log
-    
-    def add_lines(self, log, lines):
-        for line in lines:
-            if len(line) > 0:
-                log = self.log_line(log, "|" + line)
-        return log
-    
-    def add(self, log, process):
-        process_out = process.communicate()
-        output = process_out[0]
-        if output is not None and len(output) > 0:
-            log = self.log_line(log, "Output:")
-            log = self.add_lines(log, output.split("\n"))
-        errors = process_out[1]
-        if errors is not None and len(errors) > 0:
-            log = self.log_line(log, "Errors:")
-            log = self.add_lines(log, errors.split("\n"))
-        return log
-    
-    def get_param(self, params, param_name, def_value):
-        ret = None
-        if param_name in params and params[param_name] is not None and \
-                len(str(params[param_name])) > 0:
-            ret = str(params[param_name])
-        else:
-            ret = str(def_value)
-        return ret
-    
-    def add_param(self, params, param_name, cli_arg, target_args, bool=False):
-        if param_name in params and params[param_name] is not None and \
-                len(str(params[param_name])) > 0:
-            value = params[param_name]
-            if bool:
-                if value == 1:
-                    target_args.append(cli_arg)
-            else:
-                target_args.append(cli_arg)
-                target_args.append(str(value))
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -83,247 +36,93 @@ class PangenomeOrthomcl:
         #END_CONSTRUCTOR
         pass
 
+
     def build_pangenome_with_orthomcl(self, ctx, params):
+        """
+        :param params: instance of type "BuildPangenomeWithOrthmclParams"
+           (Input parameters of build_pangenome_with_orthomcl method.
+           input_genomeset_ref - optional input reference to genome set
+           object (alternative way is input_genome_refs); input_genome_refs -
+           optional input list of references to genome objects (alternative
+           way is input_genomeset_ref); output_workspace - workspace for
+           saving resulting pangenome; output_pangenome_id - name of
+           resulting pangenome object; num_descriptions - [blastp, -v] Store
+           one-line descriptions for this number of database sequences.
+           Default value is 100000. num_alignments - [blastp, -b] Store
+           alignments for this number of database sequences. Default value is
+           100000. evalue - [blastp, -e] Expect value (E) for saving hits.
+           Default value is 1e-5. word_size - [blastp, -W] Word size of
+           initial match. Valid word sizes are 2-7. Default value is 3.
+           gapopen - [blastp, -G] Cost to open a gap. Default value is 11.
+           gapextend - [blastp, -E] Cost to extend a gap. Default value is 1.
+           matrix - [blastp, -M] Scoring matrix name. Default value is
+           BLOSUM62. threshold - [blastp, -f] Minimum score to add a word to
+           the BLAST lookup table. Default value is 11. comp_based_stats -
+           [blastp, -C] Use composition-based statistics (0: no
+           composition-based statistics; 1: Composition-based statistics as
+           in NAR 29:2994-3005, 2001; 2: Composition-based score adjustments
+           as in Bioinformatics 21:902-911, 2005, conditioned on sequence
+           properties; 3 - Composition-based score adjustment as in
+           Bioinformatics 21:902-911, 2005, unconditionally). Default value
+           is 2. seg - [blastp, -F] Filter query sequence with SEG (yes/no).
+           Default value is yes. lcase_masking - [blastp, -U] Use lower case
+           filtering in query and subject sequence(s). Default value is
+           false(0). xdrop_gap_final - [blastp, -Z] Heuristic value (in bits)
+           for final gapped alignment. Default value is 25. window_size -
+           [blastp, -A] Multiple hits window size, use 0 to specify 1-hit
+           algorithm. Default value is 40. use_sw_tback - [blastp, -s]
+           Compute locally optimal Smith-Waterman alignments. Default value
+           is false(0). mcl_p - [mcl, -P] Prune number. Default value is
+           10000. mcl_s - [mcl, -S] Selection number. Default value is 1100.
+           mcl_r - [mcl, -R] Recovery number. Default value is 1400. mcl_pct
+           - [mcl, -pct] Recovery percentage. Default value is 90. mcl_warn_p
+           - [mcl, -warn-p] Warn if pruning reduces mass to this weight.
+           Default value is 10. mcl_warn_factor - [mcl, -warn-factor] Warn if
+           pruning reduces entry count by this value. Default value is 1000.
+           mcl_init_l - [mcl, -l] Initial loop length. Default value is 0.
+           mcl_main_l - [mcl, -L] Main loop length. Default value is 10000.
+           mcl_init_i - [mcl, -i] Initial inflation. Default value is 2.0.
+           mcl_main_i - [mcl, -I] Main inflation. Default value is 1.5.) ->
+           structure: parameter "input_genomeset_ref" of type
+           "ws_genomeset_id" (The workspace ID for a GenomeSet data object.
+           @id ws KBaseSearch.GenomeSet), parameter "input_genome_refs" of
+           list of type "ws_genome_id" (The workspace ID for a GenomeSet data
+           object. @id ws KBaseGenome.Genome), parameter "output_workspace"
+           of type "workspace" (Name of workspace.), parameter
+           "output_pangenome_id" of type "ws_pangenome_id" (The workspace ID
+           for a Pangenome data object. @id ws KBaseGenomes.Pangenome),
+           parameter "num_descriptions" of Long, parameter "num_alignments"
+           of Long, parameter "evalue" of String, parameter "word_size" of
+           Long, parameter "gapopen" of Long, parameter "gapextend" of Long,
+           parameter "matrix" of String, parameter "threshold" of Long,
+           parameter "comp_based_stats" of String, parameter "seg" of String,
+           parameter "lcase_masking" of type "boolean" (Indicates true or
+           false values, false = 0, true = 1 @range [0,1]), parameter
+           "xdrop_gap_final" of Double, parameter "window_size" of Long,
+           parameter "use_sw_tback" of type "boolean" (Indicates true or
+           false values, false = 0, true = 1 @range [0,1]), parameter "mcl_p"
+           of Long, parameter "mcl_s" of Long, parameter "mcl_r" of Long,
+           parameter "mcl_pct" of Long, parameter "mcl_warn_p" of Long,
+           parameter "mcl_warn_factor" of Long, parameter "mcl_init_l" of
+           Long, parameter "mcl_main_l" of Long, parameter "mcl_init_i" of
+           Double, parameter "mcl_main_i" of Double
+        :returns: instance of type "BuildPangenomeWithOrthmclResult" (Output
+           results of build_pangenome_with_orthomcl method. One of
+           'pangenome_ref' and 'error' fields should be defined.) ->
+           structure: parameter "pangenome_ref" of type "ws_pangenome_id"
+           (The workspace ID for a Pangenome data object. @id ws
+           KBaseGenomes.Pangenome), parameter "report_name" of String,
+           parameter "report_ref" of String
+        """
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN build_pangenome_with_orthomcl
-        log = ""
         try:
-            log = self.log_line(log, "Input parameters: " + json.dumps(params))
-            if os.path.exists(self.scratch):
-                shutil.rmtree(self.scratch)
-            os.makedirs(self.scratch)
-            log = self.log_line(log, "Starting mysql service")
-            log = self.add(log, subprocess.Popen(["service", "mysql", "start"], 
-                    cwd=self.scratch, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Preparing database")
-            db = MySQLdb.connect(host="localhost", user="root", passwd="12345");
-            cur = db.cursor()
-            cur.execute("DROP DATABASE IF EXISTS orthomcl")
-            cur.execute("CREATE DATABASE orthomcl")
-            cur.close()
-            db.close()
-            #######################################################
-            log = self.log_line(log, "Preparing orthomcl config file")
-            orthomcl_cfg = self.scratch + "/orthomcl.cfg"
-            f = open(orthomcl_cfg, "w")
-            f.write("dbVendor=mysql\n");
-            f.write("dbConnectString=dbi:mysql:orthomcl:mysql_local_infile=1:localhost:" + 
-                    "3306\n")
-            f.write("dbLogin=root\n")
-            f.write("dbPassword=12345\n")
-            f.write("similarSequencesTable=SimilarSequences\n")
-            f.write("orthologTable=Ortholog\n")
-            f.write("inParalogTable=InParalog\n")
-            f.write("coOrthologTable=CoOrtholog\n")
-            f.write("interTaxonMatchView=InterTaxonMatch\n")
-            f.write("percentMatchCutoff=50\n")
-            f.write("evalueExponentCutoff=-5\n")
-            f.write("oracleIndexTblSpc=NONE\n")
-            f.close()
-            plbin = "/kb/deployment/plbin"
-            #######################################################
-            log = self.log_line(log, "Running orthomclInstallSchema")
-            log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclInstallSchema", 
-                    orthomcl_cfg], cwd=self.scratch, stdout=subprocess.PIPE, 
-                    stderr=subprocess.PIPE))
-            #######################################################
-            token = ctx["token"]
-            ws = workspaceService(self.workspaceURL, token=token)
-            genomeset = None
-            if "input_genomeset_ref" in params and params["input_genomeset_ref"] is not None:
-                log = self.log_line(log, "Loading GenomeSet object from workspace")
-                genomeset = ws.get_objects([{"ref": params["input_genomeset_ref"]}])[0]["data"]
-            #######################################################
-            log = self.log_line(log, "Preparing genome refs")
-            genome_refs = []
-            if genomeset is not None:
-                for param_key in genomeset["elements"]:
-                    genome_refs.append(genomeset["elements"][param_key]["ref"])
-                log = self.log_line(log, "Genome references from genome set: " + ", ".join(genome_refs))
-            if "input_genome_refs" in params and params["input_genome_refs"] is not None:
-                for genome_ref in params["input_genome_refs"]:
-                    if genome_ref is not None:
-                        genome_refs.append(genome_ref)
-                log = self.log_line(log, "Final list of genome references: " + ", ".join(genome_refs))
-            if len(genome_refs) < 2:
-                raise ValueError("Number of genomes should be more than 1")
-            if len(genome_refs) > 20:
-                raise ValueError("Number of genomes exceeds 20, which is too many for " +
-                "all-against-all blastp")
-            feature_info = {}
-            compliant_fasta_dir = self.scratch + "/compliantFasta"
-            os.makedirs(compliant_fasta_dir)
-            for genome_pos, genome_ref in enumerate(genome_refs):
-                #######################################################
-                log = self.log_line(log, "Loading Genome object from workspace for ref [" + 
-                    genome_ref + "]")
-                obj = ws.get_objects([{"ref": genome_ref}])[0]
-                info = obj["info"]
-                genome_ref = str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])
-                genome = obj["data"]
-                #######################################################
-                log = self.log_line(log, "Preparing fasta file for ref [" + genome_ref + "]")
-                genome_id = str(genome_pos + 1)
-                records = []
-                for feature_pos, feature in enumerate(genome["features"]):
-                    if feature["type"] == "CDS" and "protein_translation" in feature:
-                        sequence = feature["protein_translation"]
-                        id = str(feature_pos + 1)
-                        record = SeqRecord(Seq(sequence), id=id, description="")
-                        records.append(record)
-                        func = None
-                        if "function" in feature:
-                            func = feature["function"]
-                        feature_info[genome_id + "|" + id] = {"fid": feature["id"], "fpos": 
-                                feature_pos, "gref": genome_ref, "func": func}
-                fasta_file = self.scratch + "/" + genome_id + ".fasta"
-                SeqIO.write(records, fasta_file, "fasta")
-                #######################################################
-                log = self.log_line(log, "Running orthomclAdjustFasta for ref [" + genome_ref + "]")
-                log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclAdjustFasta", 
-                        genome_id, fasta_file, "1"], cwd=compliant_fasta_dir, 
-                        stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running orthomclFilterFasta")
-            log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclFilterFasta", 
-                    compliant_fasta_dir, "50", "10"], cwd=self.scratch, 
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running formatdb")
-            protdb = "goodProteins.fasta"  # created by orthomclFilterFasta
-            log = self.add(log, subprocess.Popen(["formatdb", "-i", protdb],
-                    cwd=self.scratch, stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running blastp")
-            blastp_args = ["blastall", "-p", "blastp", "-d", protdb, "-i", protdb, "-F", "m S", 
-                           "-v", self.get_param(params, "num_descriptions", "100000"), 
-                           "-b", self.get_param(params, "num_alignments", "100000"), 
-                           "-e", self.get_param(params, "evalue", "1e-5"), 
-                           "-m", "8",   # Alignment view is tabular (for orthomclBlastParser)
-                           "-a", "1"]   # Number of processors is always 1
-            self.add_param(params, "word_size", "-W", blastp_args)
-            self.add_param(params, "gapopen", "-G", blastp_args)
-            self.add_param(params, "gapextend", "-E", blastp_args)
-            self.add_param(params, "matrix", "-M", blastp_args)
-            self.add_param(params, "threshold", "-f", blastp_args)
-            self.add_param(params, "comp_based_stats", "-C", blastp_args)
-            self.add_param(params, "seg", "-F", blastp_args)
-            self.add_param(params, "lcase_masking", "-U", blastp_args, True)
-            self.add_param(params, "xdrop_gap_final", "-Z", blastp_args)
-            self.add_param(params, "window_size", "-A", blastp_args)
-            self.add_param(params, "use_sw_tback", "-s", blastp_args, True)
-            log = self.log_line(log, "Blastp command line: " + " ".join(blastp_args))
-            blast_output = self.scratch + "/blastres.txt"
-            with open(blast_output, "w") as outfile:
-                log = self.add(log, subprocess.Popen(blastp_args, cwd=self.scratch, 
-                        stdout=outfile, stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running orthomclBlastParser")
-            sim_seq_file = self.scratch + "/similarSequences.txt"
-            with open(sim_seq_file, "w") as outfile:
-                log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclBlastParser", 
-                        blast_output, compliant_fasta_dir], cwd=self.scratch, stdout=outfile, 
-                        stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running orthomclLoadBlast")
-            log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclLoadBlast", 
-                    orthomcl_cfg, sim_seq_file], cwd=self.scratch, stdout=subprocess.PIPE, 
-                    stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running orthomclPairs")
-            orthomcl_pairs_file = self.scratch + "/orthomcl_pairs.log"
-            log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclPairs", 
-                    orthomcl_cfg, orthomcl_pairs_file, "cleanup=no"], cwd=self.scratch, 
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running orthomclDumpPairsFiles")
-            log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclDumpPairsFiles", 
-                    orthomcl_cfg], cwd=self.scratch, stdout=subprocess.PIPE, 
-                    stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running mcl")
-            mcl_output_file = self.scratch + "/mclOutput"
-            mcl_args = ["mcl", "mclInput", "--abc", 
-                        "-I", self.get_param(params, "mcl_main_i", "1.5"), 
-                        "-o", mcl_output_file]
-            self.add_param(params, "mcl_p", "-P", mcl_args)
-            self.add_param(params, "mcl_s", "-S", mcl_args)
-            self.add_param(params, "mcl_r", "-R", mcl_args)
-            self.add_param(params, "mcl_pct", "-pct", mcl_args)
-            self.add_param(params, "mcl_warn_p", "-warn-pct", mcl_args)
-            self.add_param(params, "mcl_warn_factor", "-warn-factor", mcl_args)
-            self.add_param(params, "mcl_init_l", "-l", mcl_args)
-            self.add_param(params, "mcl_main_l", "-L", mcl_args)
-            self.add_param(params, "mcl_init_i", "-i", mcl_args)
-            log = self.log_line(log, "Mcl command line: " + " ".join(mcl_args))
-            log = self.add(log, subprocess.Popen(mcl_args, cwd=self.scratch, 
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Running orthomclMclToGroups")
-            groups_file = self.scratch + "/groups.txt"
-            with open(groups_file, "w") as outfile, open(mcl_output_file, "r") as infile:
-                log = self.add(log, subprocess.Popen(["perl", plbin + "/orthomclMclToGroups", 
-                        "grp", "1000"], cwd=self.scratch, stdin=infile, stdout=outfile, 
-                        stderr=subprocess.PIPE))
-            #######################################################
-            log = self.log_line(log, "Parsing groups file")
-            output_obj_name = params["output_pangenome_id"]
-            orthologs = [];
-            with open(groups_file, "r") as infile:
-                for line_pos, line in enumerate(infile.readlines()):
-                    cluster_id = "cluster" + str(line_pos + 1)
-                    function = ""
-                    items = []
-                    words = line.rstrip().split(" ")
-                    for id in words[1:]:
-                        feature = feature_info[id]
-                        items.append([feature["fid"], feature["fpos"], feature["gref"]])
-                        func = feature["func"]
-                        if func is not None and len(func) > len(function):
-                            function = func
-                    orthologs.append({"function": function, "id": cluster_id, 
-                                      "orthologs": items})
-            pangenome = {"genome_refs": genome_refs, "id": output_obj_name, "name": 
-                         output_obj_name, "orthologs": orthologs, "type": "orthomcl"}
-            #######################################################
-            log = self.log_line(log, "Saving pangenome object")
-            input_ws_objects = []
-            if "input_genomeset_ref" in params and params["input_genomeset_ref"] is not None:
-                input_ws_objects.append(params["input_genomeset_ref"])
-            if "input_genome_refs" in params and params["input_genome_refs"] is not None:
-                for genome_ref in params["input_genome_refs"]:
-                    if genome_ref is not None:
-                        input_ws_objects.append(genome_ref)
-            provenance = None
-            if "provenance" in ctx:
-                provenance = ctx["provenance"]
-            else:
-                log = self.log_line(log, "Creating provenance data")
-                provenance = [{"service": "PangenomeOrthomcl", "method": 
-                        "build_pangenome_with_orthomcl", "method_params": [params]}]
-            provenance[0]["input_ws_objects"] = input_ws_objects
-            provenance[0]["service_ver"] = "0.2"
-            provenance[0]["description"] = "Orthologous groups construction using OrthoMCL tool"
-            info = ws.save_objects({"workspace": params["output_workspace"], "objects":
-                [{"type": "KBaseGenomes.Pangenome", "name": output_obj_name, 
-                  "data": pangenome, "provenance": provenance}]})[0]
-            pangenome_ref = str(info[6]) + "/" + str(info[0]) + "/" + str(info[4])
-            report = "Input genomes: " + str(len(genome_refs)) + "\n" + \
-                "Output orthologs: " + str(len(orthologs)) + "\n"
-            report_obj = {"objects_created": [{"ref": pangenome_ref, 
-                "description": "Pangenome object"}], "text_message": report}
-            report_name = "orthomcl_report_" + str(hex(uuid.getnode()))
-            report_info = ws.save_objects({"workspace": params["output_workspace"],
-                "objects": [{"type": "KBaseReport.Report", "data": report_obj, 
-                    "name": report_name, "meta": {}, "hidden": 1, "provenance": provenance}]})[0]
-            returnVal = {"pangenome_ref": pangenome_ref, 
-                         "report_name": report_name, "report_ref": str(report_info[6]) + "/" + 
-                         str(report_info[0]) + "/" + str(report_info[4])}
+            runner = PangenomeOrthomclBuilder(self.scratch, self.workspaceURL,
+                                              params, ctx["token"], ctx["provenance"])
+            returnVal = runner.run()
         except Exception, err:
-            log = self.log_line(log, traceback.format_exc())
-            raise ValueError(log)
+            raise ValueError(traceback.format_exc())
         #END build_pangenome_with_orthomcl
 
         # At some point might do deeper type checking...
@@ -331,4 +130,13 @@ class PangenomeOrthomcl:
             raise ValueError('Method build_pangenome_with_orthomcl return value ' +
                              'returnVal is not type dict as required.')
         # return the results
+        return [returnVal]
+    def status(self, ctx):
+        #BEGIN_STATUS
+        returnVal = {'state': "OK",
+                     'message': "",
+                     'version': self.VERSION,
+                     'git_url': self.GIT_URL,
+                     'git_commit_hash': self.GIT_COMMIT_HASH}
+        #END_STATUS
         return [returnVal]

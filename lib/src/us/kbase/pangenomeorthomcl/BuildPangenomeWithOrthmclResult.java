@@ -22,31 +22,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "output_log",
-    "pangenome_ref"
+    "pangenome_ref",
+    "report_name",
+    "report_ref"
 })
 public class BuildPangenomeWithOrthmclResult {
 
-    @JsonProperty("output_log")
-    private String outputLog;
     @JsonProperty("pangenome_ref")
     private String pangenomeRef;
+    @JsonProperty("report_name")
+    private String reportName;
+    @JsonProperty("report_ref")
+    private String reportRef;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    @JsonProperty("output_log")
-    public String getOutputLog() {
-        return outputLog;
-    }
-
-    @JsonProperty("output_log")
-    public void setOutputLog(String outputLog) {
-        this.outputLog = outputLog;
-    }
-
-    public BuildPangenomeWithOrthmclResult withOutputLog(String outputLog) {
-        this.outputLog = outputLog;
-        return this;
-    }
 
     @JsonProperty("pangenome_ref")
     public String getPangenomeRef() {
@@ -63,6 +51,36 @@ public class BuildPangenomeWithOrthmclResult {
         return this;
     }
 
+    @JsonProperty("report_name")
+    public String getReportName() {
+        return reportName;
+    }
+
+    @JsonProperty("report_name")
+    public void setReportName(String reportName) {
+        this.reportName = reportName;
+    }
+
+    public BuildPangenomeWithOrthmclResult withReportName(String reportName) {
+        this.reportName = reportName;
+        return this;
+    }
+
+    @JsonProperty("report_ref")
+    public String getReportRef() {
+        return reportRef;
+    }
+
+    @JsonProperty("report_ref")
+    public void setReportRef(String reportRef) {
+        this.reportRef = reportRef;
+    }
+
+    public BuildPangenomeWithOrthmclResult withReportRef(String reportRef) {
+        this.reportRef = reportRef;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -75,7 +93,7 @@ public class BuildPangenomeWithOrthmclResult {
 
     @Override
     public String toString() {
-        return ((((((("BuildPangenomeWithOrthmclResult"+" [outputLog=")+ outputLog)+", pangenomeRef=")+ pangenomeRef)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((("BuildPangenomeWithOrthmclResult"+" [pangenomeRef=")+ pangenomeRef)+", reportName=")+ reportName)+", reportRef=")+ reportRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
