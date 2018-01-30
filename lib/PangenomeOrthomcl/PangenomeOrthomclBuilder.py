@@ -137,7 +137,7 @@ class PangenomeOrthomclBuilder:
             genome = gaapi.get_genome_v1({"genomes": [{"ref": genome_ref}],
                                           "included_fields": ["scientific_name"],
                                           "included_feature_fields": ["id", "protein_translation",
-                                                                      "type", "function"
+                                                                      "type", "function", "functions"
                                                                       ]})["genomes"][0]["data"]
             ############################# Features + Fasta ##########################
             self.log_line("Preparing fasta file for ref [" + genome_ref + "]")
