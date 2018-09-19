@@ -249,7 +249,6 @@ description : |
 	<p>The input to OrthoMCL is a set of genomes and a list of genomes; the output is a Pangenome object.</p>
 	<p>Li Li, Christian J. Stoeckert, Jr., and David S. Roos. OrthoMCL: Identification of Ortholog Groups for Eukaryotic Genomes. Genome Res. 2003 13: 2178-2189.</p>
 
-
 publications :
     -
         display-text: |
