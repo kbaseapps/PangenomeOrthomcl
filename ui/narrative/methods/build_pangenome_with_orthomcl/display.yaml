@@ -247,7 +247,6 @@ parameters :
 description : |
 	<p>OrthoMCL is a genome-scale algorithm for grouping orthologous protein sequences. It provides not only groups shared by two or more species/genomes, but also groups representing species-specific gene expansion families. So it serves as an important utility for automated eukaryotic genome annotation.</p>
 	<p>The input to OrthoMCL is a set of genomes and a list of genomes; the output is a Pangenome object.</p>
-	<p>Li Li, Christian J. Stoeckert, Jr., and David S. Roos. OrthoMCL: Identification of Ortholog Groups for Eukaryotic Genomes. Genome Res. 2003 13: 2178-2189.</p>
 
 publications :
     -
