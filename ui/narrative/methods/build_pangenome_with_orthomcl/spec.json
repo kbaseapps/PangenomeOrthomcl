@@ -9,7 +9,7 @@
     "categories": ["active","comparative_genomics"],
     "widgets": {
         "input": null,
-        "output": "kbasePanGenome"
+        "output": "no-display"
     },
     "parameters": [ 
         {
