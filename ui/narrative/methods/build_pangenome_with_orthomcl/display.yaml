@@ -1,10 +1,13 @@
 #
 # define display information
 #
-name: Build Pangenome with OrthoMCL
+name: Build Pangenome with OrthoMCL - v2.0
 tooltip: |
-	Perform OrthoMCL orthologous groups construction
-screenshots: []
+	Create a Pangenome object by performing OrthoMCL orthologous groups construction on a set of Genomes.
+screenshots:
+    - OrthoMCL_output1.png
+    - OrthoMCL_output2.png
+    - OrthoMCL_output3.png
 
 icon: orthomcl-purple.png
 
@@ -29,224 +32,210 @@ suggestions:
 parameters :
     input_genomeset :
         ui-name : |
-            Genome Set
+            GenomeSet
         short-hint : |
-            A set of references to genomes stored in KBase
-        long-hint  : |
-            A set of references to genomes stored in KBase
+            Add a KBase GenomeSet object (contains references to a set of genomes). This is in addition to the individual Genomes listed below (if any).
 
     input_genomes :
         ui-name : |
             Genomes
         short-hint : |
-            A list of references to genomes stored in KBase
-        long-hint  : |
-            A list of references to genomes stored in KBase
+            Add one or more KBase Genome objects (each is a reference to a single genome). This is in addition to the GenomeSet given above (if any).
 
     output_pangenome :
         ui-name : |
             Pangenome ID
         short-hint : |
-            A list of all distinct protein families identified in input genome set
-        long-hint  : |
-            A list of all distinct protein families identified by OrthoMCL in a set of input genome sequences, as well as the IDs of the proteins present in each family
+            The name of the output Pangenome object. A list of all the distinct protein families identified by OrthoMCL in the input genome sequence(s) or set of genome sequences. Also lists the IDs of the proteins present in each family.
 
     num_descriptions :
         ui-name : |
             num_descriptions
         short-hint : |
-            Store one-line descriptions for this number of database sequences
-        long-hint : |
-            [blastp, -v] Store one-line descriptions for this number of database sequences. Default value is 100000.
+            Number of one-line database sequence descriptions to store. Equivalen of blastp, -v. Default value is 100000.
 
     num_alignments :
         ui-name : |
             num_alignments
         short-hint : |
-            Store alignments for this number of database sequences
-        long-hint : |
-            [blastp, -b] Store alignments for this number of database sequences. Default value is 100000.
+            Number of database sequence alignments to store. Equivalent of blastp, -b. Default value is 100000.
 
     evalue :
         ui-name : |
-            evalue
+            e-value
         short-hint : |
-            Expect value (E) for saving hits
-        long-hint : |
-            [blastp, -e] Expect value (E) for saving hits. Default value is 1e-5.
+            Maximum expect value (E) for saving hits. Equivalent of blastp, -e. Default value is 1e-5.
 
     word_size :
         ui-name : |
             word_size
         short-hint : |
-            Word size of initial match
-        long-hint : |
-            [blastp, -W] Word size of initial match. Valid word sizes are 2-7. Default value is 3.
+            Word size of initial match. Equivalent of blastp, -W. Valid word sizes are 2-7. Default value is 3.
 
     gapopen :
         ui-name : |
             gapopen
         short-hint : |
-            Cost to open a gap
-        long-hint : |
-            [blastp, -G] Cost to open a gap. Default value is 11.
+            Cost to open a gap. Equivalent of blastp, -G. Default value is 11.
 
     gapextend :
         ui-name : |
             gapextend
         short-hint : |
-            Cost to extend a gap
-        long-hint : |
-            [blastp, -E] Cost to extend a gap. Default value is 1.
+            Cost to extend a gap. Equivalent of blastp, -E. Default value is 1.
 
     matrix :
         ui-name : |
             matrix
         short-hint : |
-            Scoring matrix name
-        long-hint : |
-            [blastp, -M] Scoring matrix name. Default value is BLOSUM62.
+            Scoring matrix name. Equivalent of blastp, -M. Default value is BLOSUM62.
 
     threshold :
         ui-name : |
             threshold
         short-hint : |
-            Minimum score to add a word to the BLAST lookup table
-        long-hint : |
-            [blastp, -f] Minimum score to add a word to the BLAST lookup table. Default value is 11.
+            Minimum score to add a word to the BLAST lookup table. Equivalent of blastp, -f. Default value is 11.
 
     comp_based_stats :
         ui-name : |
             comp_based_stats
         short-hint : |
-            Use composition-based statistics
-        long-hint : |
-            [blastp, -C] Use composition-based statistics (0: no composition-based statistics; 1: composition-based statistics as in NAR 29:2994-3005, 2001; 2: Composition-based score adjustments as in Bioinformatics 21:902-911, 2005, conditioned on sequence properties; 3 - Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally). Default value is 2.
+            Use composition-based statistics. Equivalent of blastp, -C. Default value is 2. 0: no composition-based statistics; 1: composition-based statistics as in NAR 29:2994-3005, 2001; 2: Composition-based score adjustments as in Bioinformatics 21:902-911, 2005, conditioned on sequence properties; 3: Composition-based score adjustment as in Bioinformatics 21:902-911, 2005, unconditionally.
 
     seg :
         ui-name : |
             seg
         short-hint : |
-             Filter query sequence with SEG
-        long-hint : |
-            [blastp, -F] Filter query sequence with SEG (yes/no). Default value is yes.
+             Filter query sequence with SEG (yes/no). Equivalent of blastp, -F. Default value is yes.
 
     lcase_masking :
         ui-name : |
             lcase_masking
         short-hint : |
-            Use lower case filtering in query and subject sequences
-        long-hint : |
-            [blastp, -U] Use lower case filtering in query and subject sequence(s). Default value is false(0).
+            Use lower case filtering in query and subject sequences. Equivalent of blastp, -U. Default value is false(0).
 
     xdrop_gap_final :
         ui-name : |
             xdrop_gap_final
         short-hint : |
-            Heuristic value (in bits) for final gapped alignment
-        long-hint : |
-            [blastp, -Z] Heuristic value (in bits) for final gapped alignment. Default value is 25.
+            Heuristic value (in bits) for final gapped alignment. Equivalent of blastp, -Z. Default value is 25.
 
     window_size :
         ui-name : |
             window_size
         short-hint : |
-            Multiple hits window size
-        long-hint : |
-            [blastp, -A] Multiple hits window size, use 0 to specify 1-hit algorithm. Default value is 40.
+            Multiple hits window size; use 0 to specify 1-hit algorithm. Equivalent of blastp, -A. Default value is 40.
 
     use_sw_tback :
         ui-name : |
             use_sw_tback
         short-hint : |
-            Compute locally optimal Smith-Waterman alignments
-        long-hint : |
-            [blastp, -s] Compute locally optimal Smith-Waterman alignments. Default value is false(0).
+            Compute locally optimal Smith-Waterman alignments. Equivalent of blastp, -s. Default value is false(0).
 
     mcl_p :
         ui-name : |
             mcl_p
         short-hint : |
-            Prune number
-        long-hint : |
-            [mcl, -P] Prune number. Default value is 10000.
+            Prune number. Equivalent of mcl, -P] Prune number. Default value is 10000.
 
     mcl_s :
         ui-name : |
             mcl_s
         short-hint : |
-            Selection number
-        long-hint : |
-            [mcl, -S] Selection number. Default value is 1100.
+            Selection number. Equivalent of mcl, -S. Default value is 1100.
 
     mcl_r :
         ui-name : |
             mcl_r
         short-hint : |
-            Recovery number
-        long-hint : |
-            [mcl, -R] Recovery number. Default value is 1400.
+            Recovery number. Equivalent of mcl, -R. Default value is 1400.
 
     mcl_pct :
         ui-name : |
             mcl_pct
         short-hint : |
-            Recovery percentage
-        long-hint : |
-            [mcl, -pct] Recovery percentage. Default value is 90.
+            Recovery percentage. Equivalent of mcl, -pct. Default value is 90.
 
     mcl_warn_p :
         ui-name : |
             mcl_warn_p
         short-hint : |
-            Warn if pruning reduces mass to this weight
-        long-hint : |
-            [mcl, -warn-p] Warn if pruning reduces mass to this weight. Default value is 10.
+            Warn if pruning reduces mass to this weight. Equivalent of mcl, -warn-p. Default value is 10.
 
     mcl_warn_factor :
         ui-name : |
             mcl_warn_factor
         short-hint : |
-            Warn if pruning reduces entry count by this value
-        long-hint : |
-            [mcl, -warn-factor] Warn if pruning reduces entry count by this value. Default value is 1000.
+            Warn if pruning reduces entry count by this value. Equivalent of mcl, -warn-factor. Default value is 1000.
 
     mcl_init_l :
         ui-name : |
             mcl_init_l
         short-hint : |
-            Initial loop length
-        long-hint : |
-            [mcl, -l] Initial loop length. Default value is 0.
+            Initial loop length. Equivalent of mcl, -l. Default value is 0.
 
     mcl_main_l :
         ui-name : |
             mcl_main_l
         short-hint : |
-            Main loop length
-        long-hint : |
-            [mcl, -L] Main loop length. Default value is 10000.
+            Main loop length. Equivalent of mcl, -L. Default value is 10000.
 
     mcl_init_i :
         ui-name : |
             mcl_init_i
         short-hint : |
-            Initial inflation
-        long-hint : |
-            [mcl, -i] Initial inflation. Default value is 2.0.
+            Initial inflation. Equivalent of mcl, -i. Default value is 2.0.
 
     mcl_main_i :
         ui-name : |
             mcl_main_i
         short-hint : |
-            Main inflation
-        long-hint : |
-            [mcl, -I] Main inflation. Default value is 1.5.
+            Main inflation. Equivalent of mcl, -I. Default value is 1.5.
 
 
 description : |
-	<p>OrthoMCL is a genome-scale algorithm for grouping orthologous protein sequences. It provides not only groups shared by two or more species/genomes, but also groups representing species-specific gene expansion families. So it serves as an important utility for automated eukaryotic genome annotation.</p>
-	<p>The input to OrthoMCL is a set of genomes and a list of genomes; the output is a Pangenome object.</p>
+    <p><h3>Background Information</h3><br>Orthologs are homologs seperated by speciation events. Paralogs are homologs separated by duplication events. Detection of orthologs is becoming much more important with the rapid progress in genome sequencing.</p>
+
+    <p>OrthoMCL is a genome-scale algorithm for grouping orthologous protein sequences. It provides not only groups shared by two or more species/genomes, but also groups representing species-specific gene expansion families.  So it serves as an important utility for automated eukaryotic genome annotation.</p>
+
+    <p>OrthoMCL starts with reciprocal best BLAST hits within each genome as potential in-paralog/recent paralog pairs and reciprocal best hits across any two genomes as potential ortholog pairs. Related proteins are interlinked in a similarity graph. Then, <a href=”http://micans.org/mcl/”>MCL</a> is invoked to split mega-clusters. This process is analogous to the manual review in COG construction. MCL clustering is based on weights between each pair of proteins, so to correct for differences in evolutionary distance, the weights are normalized before running MCL.</p>
+
+    <p>OrthoMCL is similar to the INPARANOID algorithm, but is extended to cluster orthologs from multiple species. OrthoMCL clusters are coherent with groups identified by EGO, and an analysis using EC number suggests a high degree of reliability [1].</p>
+
+    <p><h3>Overview of OrthoMCL Processing</h3>
+    <ul>
+      <li>All-vs-all BLASTP of the proteins.</li>
+      <li>Compute <i>percent match length.</i>
+        <ul>
+		      <li>Select whichever is shorter, the query or subject sequence. Call that sequence S.</li>
+		      <li>Count all amino acids in S that participate in any HSP.</li>
+		      <li>Divide that count by the length of S and multiply by 100.</li>
+        </ul></li>
+	    <li>Apply thresholds to blast result. Keep matches with E-Value < 1e-5 percent match length >= 50%.</li>
+	    <li>Find potential inparalog, ortholog, and co-ortholog <i>pairs</i> using the Orthomcl Pairs program. These are the pairs that are counted to form the <i>Average % Connectivity</i> statistic per group.</li>
+	    <li>Use the <a href="http://micans.org/mcl/">MCL</a> program to cluster the pairs into groups.</li>
+    </ul>
+    </p>
+
+    <p>In KBase, the input to OrthoMCL is a set of genomes and/or a list of individual genomes, and the output is a Pangenome object. A pangenome is the set of protein-coding genes in all the selected organisms. It includes genes present in all organisms (core genome) and genes present only in some organisms. The advanced parameters are either options for the BLAST or <a href=”https://micans.org/mcl/”>MCL</a> portions of the code.</p>
+
+    <p><h3>Output</h3><br>The output cell has three tabs:
+    <ul>
+      <li>Pangenome Summary
+        <ul>
+          <li>The Summary tab has an overview of the genomes, their genes, homologs, families, and singleton genes.</li>
+        </ul></li>
+      <li>Shared homolog families
+        <ul>
+          <li>The tab for Shared homolog families has a matrix of all the genomes vs all the genomes. The matrix numbers are the numbers of homolog families that are in common between the row and column genomes. The red numbers on the diagonal are the total number of homolog families in the genome.</li>
+        </ul></li>
+      <li>Protein families
+        <ul>
+          <li>The tab for Protein families has a list of the homologous protein clusters predicted by OrthoMCL. There is a functional assignment for the cluster, a cluster number, the number of genes in the cluster, and the number of genomes that are part of the cluster. There is a search box for subsetting by keyword, and the columns can be sorted by function and cluster number. OrthoMCL numbers the clusters by the gene count with cluster1 having the most genes and the last clusters being singletons. Clicking on a cluster ID will open a new tab with details about the cluster, including the list of genes and their genomes.</li>
+        </ul></li>
+    </ul>
+
+    <p>In the data panel, the newly created Pangenome object can be downloaded as a tab-separated values file (TSV) or as Excel.</p>
 
 publications :
     -
