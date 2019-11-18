@@ -107,15 +107,15 @@ class PangenomeOrthomclBuilder:
 
     def prepare_genome_refs(self, genomeset):
         self.log_line("Preparing genome refs")
-        genome_refs = []
+        genome_refs = set()
         if genomeset is not None:
             for param_key in genomeset["elements"]:
-                genome_refs.append(genomeset["elements"][param_key]["ref"])
+                genome_refs.add(genomeset["elements"][param_key]["ref"])
             self.log_line("Genome references from genome set: " + ", ".join(genome_refs))
         if "input_genome_refs" in self.params and self.params["input_genome_refs"] is not None:
             for genome_ref in self.params["input_genome_refs"]:
                 if genome_ref is not None:
-                    genome_refs.append(genome_ref)
+                    genome_refs.add(genome_ref)
             self.log_line("Final list of genome references: " + ", ".join(genome_refs))
         if len(genome_refs) < 2:
             raise ValueError("Number of genomes should be more than 1")
